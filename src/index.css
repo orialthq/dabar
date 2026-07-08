@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+@theme {
+  /* 새벽 팔레트 — 새벽기도의 시간, 잉크와 한지 */
+  --color-ink: #10151f; /* 새벽 잉크 (배경/본문 짙은 톤) */
+  --color-ink-soft: #1b2230; /* 잉크 한 겹 위 */
+  --color-hanji: #f7f3ea; /* 한지 (밝은 배경) */
+  --color-hanji-dim: #efe9db; /* 한지 음영 */
+  --color-dawn: #d98e32; /* 동트는 빛 (액센트) */
+  --color-mist: #8a94a6; /* 새벽 안개 (보조 텍스트) */
+
+  --font-serif: "Noto Serif KR", ui-serif, serif;
+  --font-sans: "Pretendard Variable", Pretendard, ui-sans-serif, system-ui,
+    sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--color-ink);
+  color: var(--color-hanji);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 등장 모션 — 접근성 존중 */
+.rise {
+  opacity: 0;
+  transform: translateY(14px);
+  animation: rise 0.9s ease forwards;
+}
+.rise-1 { animation-delay: 0.05s; }
+.rise-2 { animation-delay: 0.2s; }
+.rise-3 { animation-delay: 0.35s; }
+.rise-4 { animation-delay: 0.5s; }
+
+@keyframes rise {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .rise {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+}
