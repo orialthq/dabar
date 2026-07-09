@@ -1,6 +1,7 @@
 const LINKS = [
   { hash: "#/read", label: "읽다" },
   { hash: "#/search", label: "찾다" },
+  { hash: "#/write", label: "새기다" },
 ];
 
 interface Props {
@@ -32,12 +33,6 @@ function Header({ active }: Props) {
             {l.label}
           </a>
         ))}
-        <span
-          className="text-mist/40 cursor-not-allowed select-none"
-          title="새기다 — M3에서 열립니다"
-        >
-          새기다
-        </span>
       </nav>
     </header>
   );
