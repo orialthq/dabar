@@ -30,6 +30,6 @@ ink #10151F · ink-soft #1B2230 · hanji #F7F3EA · hanji-dim #EFE9DB · dawn #D
 
 ## 마일스톤 현황
 - [x] M1 스캐폴드 + 랜딩 셸 + 배포 파이프라인
-- [ ] M2 개역한글 데이터 + 리더 + 검색
+- [x] M2 개역한글 데이터 + 리더 + 검색 (데이터 출처: scripts/DATA.md)
 - [ ] M3 새김 기록 (localStorage)
 - [ ] M4 AI 연결 (BYOK)

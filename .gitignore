@@ -1,7 +1,5 @@
-.gradle/
-build/
-out/
-.idea/
-*.iml
+node_modules
+dist
 .DS_Store
-data/
+*.local
+*.tsbuildinfo
