@@ -19,7 +19,7 @@
 ### macOS (Apple Silicon)
 
 ```bash
-url=$(curl -fsSL https://api.github.com/repos/orialthq/dabar/releases/latest | grep -o 'https://[^"]*-mac-arm64\.dmg') \
+url=$(curl -fsSL https://api.github.com/repos/orialthq/dabar/releases/latest | grep -o 'https://[^"]*-mac-arm64\.dmg' | head -n 1) \
   && curl -fL "$url" -o /tmp/dabar.dmg \
   && hdiutil attach /tmp/dabar.dmg -nobrowse -quiet -mountpoint /Volumes/Dabar \
   && cp -R /Volumes/Dabar/Dabar.app /Applications/ \
