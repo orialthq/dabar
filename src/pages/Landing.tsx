@@ -1,3 +1,5 @@
+import DesktopUpdate from "../components/DesktopUpdate";
+
 const FEATURES = [
   {
     step: "읽다",
@@ -30,10 +32,11 @@ const FEATURES = [
 ];
 
 const DOWNLOAD_URL = "https://github.com/orialthq/dabar/releases/latest";
+const isDesktop = typeof window !== "undefined" && Boolean(window.dabarDesktop);
 
 function Landing() {
   return (
-    <>
+    <div className="flex-1 flex flex-col">
       <section className="px-6 md:px-12 pt-16 pb-24 md:pt-24 md:pb-32 max-w-4xl mx-auto text-center">
         <p
           lang="he"
@@ -52,6 +55,12 @@ function Landing() {
           단어로 두 가지를 뜻합니다. <b className="text-hanji">말씀</b>, 그리고{" "}
           <b className="text-hanji">사건</b>. 오늘 당신에게 일어난 일을 쓰면,
           성경이 그 하루에 답합니다.
+          <span
+            className="seal ml-3 w-8 h-8 text-[13px] align-middle select-none"
+            aria-hidden="true"
+          >
+            דבר
+          </span>
         </p>
         <div className="rise rise-4 mt-10 flex flex-wrap items-center justify-center gap-4">
           <a
@@ -66,30 +75,44 @@ function Landing() {
           >
             말씀 검색
           </a>
-          <a
-            href={DOWNLOAD_URL}
-            target="_blank"
-            rel="noreferrer"
-            className="border border-hanji/25 text-hanji rounded-full px-6 py-2.5 text-sm hover:border-dawn hover:text-dawn transition"
-          >
-            앱 다운로드 (macOS·Windows)
-          </a>
+          {isDesktop ? (
+            <DesktopUpdate variant="hero" />
+          ) : (
+            <a
+              href={DOWNLOAD_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="border border-hanji/25 text-hanji rounded-full px-6 py-2.5 text-sm hover:border-dawn hover:text-dawn transition"
+            >
+              앱 다운로드 (macOS·Windows)
+            </a>
+          )}
         </div>
-        <p className="rise rise-4 mt-4 text-[11px] text-mist/80">
-          설치 시 "확인되지 않은 개발자" 경고가 뜨면 macOS는 우클릭 → 열기, Windows는
-          "추가 정보 → 실행"을 누르면 됩니다.
-        </p>
+        {!isDesktop && (
+          <p className="rise rise-4 mt-4 text-[11px] text-mist/80">
+            설치 시 "확인되지 않은 개발자" 경고가 뜨면 macOS는 우클릭 → 열기, Windows는
+            "추가 정보 → 실행"을 누르면 됩니다.
+          </p>
+        )}
       </section>
 
-      <section className="bg-hanji text-ink px-6 md:px-12 py-20 md:py-28">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="font-serif text-2xl md:text-3xl font-semibold">
-            네 가지 동사로 충분합니다
-          </h2>
+      <section className="flex-1 paper text-ink px-6 md:px-12 py-20 md:py-28">
+        <div className="max-w-5xl mx-auto gyeseon rounded-sm px-6 py-10 md:px-14 md:py-14">
+          <div className="flex items-start justify-between gap-6">
+            <h2 className="font-serif text-2xl md:text-3xl font-semibold">
+              네 가지 동사로 충분합니다
+            </h2>
+            <span
+              className="jecheom hidden md:block border border-ink/25 bg-hanji-dim/60 px-2 py-4 text-[13px] text-ink/60 select-none shrink-0"
+              aria-hidden="true"
+            >
+              말씀과 사건
+            </span>
+          </div>
           <div className="mt-12 grid gap-10 md:grid-cols-2 lg:grid-cols-4">
             {FEATURES.map((f) => (
               <article key={f.step} className="flex flex-col gap-3">
-                <div className="flex items-center justify-between border-b border-ink/15 pb-3">
+                <div className="flex items-center justify-between border-b-[4px] border-double border-ink/20 pb-3">
                   <span className="font-serif text-xl font-semibold">
                     {f.step}
                   </span>
@@ -114,7 +137,7 @@ function Landing() {
           </p>
         </div>
       </section>
-    </>
+    </div>
   );
 }
 

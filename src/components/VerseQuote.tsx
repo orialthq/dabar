@@ -23,7 +23,7 @@ function VerseQuote({ refValue, onRemove }: Props) {
   }, [refValue]);
 
   return (
-    <blockquote className="border-l-2 border-dawn/60 pl-4 py-1">
+    <blockquote className="border-l-[6px] border-double border-dawn/60 pl-4 py-1">
       {resolved ? (
         <>
           <p className="font-serif text-[15px] leading-6 text-ink/85">

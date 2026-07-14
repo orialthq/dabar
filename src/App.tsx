@@ -7,6 +7,7 @@ import Journal from "./pages/Journal";
 import Editor from "./pages/Editor";
 import Ask from "./pages/Ask";
 import Settings from "./pages/Settings";
+import DesktopUpdate from "./components/DesktopUpdate";
 import { useHashRoute } from "./lib/router";
 
 function App() {
@@ -49,17 +50,22 @@ function App() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header active={section} />
-      <main className={`flex-1 ${light ? "bg-hanji text-ink" : ""}`}>
+      <main className={`flex-1 flex flex-col ${light ? "paper text-ink" : ""}`}>
         {page}
       </main>
       <footer
         className={`px-6 md:px-12 py-8 text-xs flex flex-col md:flex-row gap-2 md:gap-6 md:items-center ${
-          light ? "bg-hanji text-ink/40 border-t border-ink/10" : "text-mist"
+          light
+            ? "paper text-ink/40 border-t-[4px] border-double border-ink/15"
+            : "text-mist"
         }`}
       >
         <span>© 2026 OriAlt</span>
         <span>성경전서 개역한글판 (대한성서공회 역, 1961)</span>
-        <span className="md:ml-auto">dabar.orialt.dev</span>
+        <span className="md:ml-auto flex items-center gap-4">
+          <DesktopUpdate variant="footer" />
+          <span>dabar.orialt.dev</span>
+        </span>
       </footer>
     </div>
   );
