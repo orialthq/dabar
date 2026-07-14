@@ -1,6 +1,7 @@
 const LINKS = [
   { hash: "#/read", label: "읽다" },
   { hash: "#/search", label: "찾다" },
+  { hash: "#/ask", label: "묻다" },
   { hash: "#/write", label: "새기다" },
 ];
 
@@ -19,7 +20,7 @@ function Header({ active }: Props) {
           dabar
         </span>
       </a>
-      <nav className="flex items-center gap-4 text-sm">
+      <nav className="flex items-center gap-4 text-sm flex-1">
         {LINKS.map((l) => (
           <a
             key={l.hash}
@@ -33,6 +34,15 @@ function Header({ active }: Props) {
             {l.label}
           </a>
         ))}
+        <a
+          href="#/settings"
+          aria-label="설정"
+          className={`ml-auto text-xs ${
+            active === "settings" ? "text-dawn" : "text-mist/70 hover:text-hanji"
+          } transition-colors`}
+        >
+          설정
+        </a>
       </nav>
     </header>
   );

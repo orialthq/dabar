@@ -337,3 +337,50 @@ export async function suggestVerses(
   out.dispose?.();
   return result;
 }
+
+/**
+ * 묻다(M5b) 역전 RAG용 검색: 1위 주제 큐레이션 3건 + 전 절 시맨틱 상위(장 중복 억제) 5건.
+ * 참조만 반환 — 본문 해석과 프롬프트 구성은 ask.ts 담당.
+ */
+export async function retrieveForAsk(question: string): Promise<VerseRef[]> {
+  const trimmed = question.trim();
+  if (!trimmed) return [];
+  const [embed, index, themes] = await Promise.all([loadEmbedder(), loadIndex(), loadThemes()]);
+  const out = await embed([`${themes.queryPrefix}${trimmed}`], {
+    pooling: "mean",
+    normalize: true,
+  });
+  const q = out.data;
+
+  const themeScores = new Array<number>(themes.themes.length).fill(-Infinity);
+  for (let a = 0; a < themes.anchorTheme.length; a++) {
+    let dot = 0;
+    const base = a * themes.dim;
+    for (let d = 0; d < themes.dim; d++) dot += q[d] * themes.anchorVectors[base + d];
+    const score = dot * themes.anchorScales[a];
+    const t = themes.anchorTheme[a];
+    if (score > themeScores[t]) themeScores[t] = score;
+  }
+  let best = 0;
+  for (let t = 1; t < themeScores.length; t++) if (themeScores[t] > themeScores[best]) best = t;
+
+  const refs: VerseRef[] = [];
+  const usedVerse = new Set<string>();
+  const usedChapter = new Set<string>();
+  for (const v of themes.themes[best].verses.slice(0, 3)) {
+    usedVerse.add(`${v.bookId}:${v.chapter}:${v.verse}`);
+    usedChapter.add(`${v.bookId}:${v.chapter}`);
+    refs.push(v);
+  }
+  const { meta, vectors, scales } = index;
+  const dense = denseTopK(q, vectors, scales, meta.total, meta.dim, 12);
+  out.dispose?.();
+  for (const { idx } of dense) {
+    if (refs.length >= 8) break;
+    const ref = indexToRef(meta, idx);
+    if (usedChapter.has(`${ref.bookId}:${ref.chapter}`)) continue;
+    usedChapter.add(`${ref.bookId}:${ref.chapter}`);
+    refs.push(ref);
+  }
+  return refs;
+}

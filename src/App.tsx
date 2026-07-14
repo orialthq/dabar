@@ -5,6 +5,8 @@ import Chapter from "./pages/Chapter";
 import Search from "./pages/Search";
 import Journal from "./pages/Journal";
 import Editor from "./pages/Editor";
+import Ask from "./pages/Ask";
+import Settings from "./pages/Settings";
 import { useHashRoute } from "./lib/router";
 
 function App() {
@@ -24,6 +26,12 @@ function App() {
     light = true;
   } else if (section === "search") {
     page = <Search />;
+    light = true;
+  } else if (section === "ask") {
+    page = <Ask />;
+    light = true;
+  } else if (section === "settings") {
+    page = <Settings />;
     light = true;
   } else if (section === "write" && route[1] === "new") {
     page = <Editor />;
