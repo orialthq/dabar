@@ -1,4 +1,6 @@
 # 데스크톱 앱 빌드·배포 — v* 태그 푸시 시 GitHub Releases에 업로드 (무서명)
+# draft 릴리스를 먼저 만들어 두 플랫폼 잡의 릴리스 생성 경합(draft 중복)을 막고,
+# 두 빌드가 모두 끝나면 발행한다.
 name: Desktop Release
 
 on:
@@ -10,7 +12,15 @@ permissions:
   contents: write
 
 jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    steps:
+      - run: gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || gh release create "$GITHUB_REF_NAME" --draft --title "다바르 ${GITHUB_REF_NAME#v}" --repo "$GITHUB_REPOSITORY"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   build:
+    needs: create-release
     strategy:
       matrix:
         include:
@@ -28,5 +38,13 @@ jobs:
       - run: npm ci
       - run: npm run build:desktop
       - run: npx electron-builder ${{ matrix.args }} --publish always
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - run: gh release edit "$GITHUB_REF_NAME" --draft=false --latest --repo "$GITHUB_REPOSITORY"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

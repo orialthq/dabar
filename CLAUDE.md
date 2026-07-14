@@ -41,4 +41,4 @@
 - [x] M4 AI 연결 (BYOK) — 말씀 추천 + 묻다, 참조 전용 RAG
 - [x] M5a 하이브리드 말씀 추천 (로컬, 전 사용자) — 주제 앵커 + 큐레이션 + 발견 슬롯, 골든셋 9/10
 - [x] M5b WebLLM 챗 레이어 + 엔진 추상화 — 역전 RAG 묻다 + 묵상 질문, Qwen3-4B 기본
-- [ ] M6 데스크톱 앱 (Electron, macOS·Windows, 무서명 + GitHub Releases) — 구현 완료, 첫 릴리스 태그 대기
+- [x] M6 데스크톱 앱 (Electron, macOS·Windows, 무서명 + GitHub Releases) — v0.1.0 릴리스 발행
