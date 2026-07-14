@@ -29,7 +29,9 @@
 - 검증: 빌드(`npm run build`) 통과 + SPEC-M5 §3 검증 기준 충족 후 마일스톤 종료
 
 ## 배포
-- `main` push → GitHub Actions → GitHub Pages. vite base `/dabar/` (커스텀 도메인 전환 시 `/` + public/CNAME)
+- 웹: `main` push → GitHub Actions → GitHub Pages. vite base `/dabar/` (커스텀 도메인 전환 시 `/` + public/CNAME)
+- 데스크톱(M6): `v*` 태그 push → `.github/workflows/desktop.yml` → electron-builder(mac dmg / win nsis, 무서명) → GitHub Releases. 로컬 dmg 빌드는 이 머신(macOS 26)에서 dmgbuild 비호환으로 실패 — zip 타겟으로 검증하고 dmg는 CI에서 빌드
+- 데스크톱 셸: `electron/main.mjs` + electron-serve(app://), 데스크톱 빌드는 `npm run build:desktop`(base `/`, dist-desktop). 프론트 라이브러리는 devDependencies 유지(안 그러면 node_modules가 패키지에 포장돼 1.9GB가 됨)
 - 대용량 파일: 임베딩 샤드·모델은 GitHub 파일 100MB 제한 미만 유지. 모델 자체는 HuggingFace CDN에서 로드(리포에 넣지 않음)
 
 ## 마일스톤 현황
@@ -39,3 +41,4 @@
 - [x] M4 AI 연결 (BYOK) — 말씀 추천 + 묻다, 참조 전용 RAG
 - [x] M5a 하이브리드 말씀 추천 (로컬, 전 사용자) — 주제 앵커 + 큐레이션 + 발견 슬롯, 골든셋 9/10
 - [x] M5b WebLLM 챗 레이어 + 엔진 추상화 — 역전 RAG 묻다 + 묵상 질문, Qwen3-4B 기본
+- [ ] M6 데스크톱 앱 (Electron, macOS·Windows, 무서명 + GitHub Releases) — 구현 완료, 첫 릴리스 태그 대기
