@@ -16,10 +16,10 @@
 
 ## 아키텍처 요점
 - 성경 데이터: `public/bible/books.json` + `{id}.json` (66권, 31,102절, 무결성 검증 완료 — 출처와 검증 과정은 `scripts/DATA.md`)
-- 라우팅: 해시 기반 (`src/lib/router.ts`) — #/read, #/search, #/ask, #/write, #/settings
+- 라우팅: 해시 기반 (`src/lib/router.ts`) — #/read, #/search, #/ask, #/write, #/settings (전부 구현됨)
 - 새김: 참조만 저장(본문 저장 금지), 렌더 시 DB 해석 (`src/lib/journal.ts`)
-- AI(M5 전환 중): 말씀 추천 = **주제 앵커 하이브리드**(주제 분류 → 큐레이션 `scripts/themes.json` + 전 절 시맨틱 "발견" 슬롯 — 순수 dense는 골든셋 0/10 실측으로 기각, SPEC-M5 §5), 챗 = 엔진 추상화(webllm 기본 / ollama / anthropic BYOK 존치). 상세는 `SPEC-M5.md`
-- M4의 참조 검증 패턴(`resolveRefs`: AI 참조 → DB 대조 → 무효 폐기)은 챗 레이어에서 계속 사용
+- AI(M5): 말씀 추천 = **주제 앵커 하이브리드**(주제 분류 → 큐레이션 `scripts/themes.json` + 전 절 시맨틱 "발견" 슬롯 — 순수 dense는 골든셋 0/10 실측으로 기각, SPEC-M5 §5), 챗 = 엔진 추상화 `src/lib/engine.ts`(webllm Qwen3-4B 기본 / ollama / anthropic BYOK). 상세는 `SPEC-M5.md`
+- 참조 검증(`src/lib/ask.ts resolveRefs`): AI 참조 → 공급 목록 화이트리스트 + DB 대조 → 무효 폐기. 역전 RAG(검색이 절 공급, LLM은 그 안에서만)와 함께 챗 레이어의 불변 구조
 
 ## 컨벤션
 - TypeScript strict, `any` 금지. 컴포넌트 함수형+hooks, 파일당 하나, PascalCase
@@ -38,4 +38,4 @@
 - [x] M3 새기다 — 기록 + 말씀 첨부 + 타임라인 + 마크다운 내보내기
 - [x] M4 AI 연결 (BYOK) — 말씀 추천 + 묻다, 참조 전용 RAG
 - [x] M5a 하이브리드 말씀 추천 (로컬, 전 사용자) — 주제 앵커 + 큐레이션 + 발견 슬롯, 골든셋 9/10
-- [ ] M5b WebLLM 챗 레이어 + 엔진 추상화
+- [ ] M5b WebLLM 챗 레이어 + 엔진 추상화 — 구현·검증 완료, 사용자 확인 대기

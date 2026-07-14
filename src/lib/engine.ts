@@ -55,6 +55,8 @@ export interface GenerateOptions {
   onToken?: (delta: string) => void;
   /** webllm 모델 다운로드/로드 진행 */
   onProgress?: (p: EngineProgress) => void;
+  /** 기본 0.7 — 형식이 엄격한 출력(묵상 질문 등)은 낮춰서 안정화 */
+  temperature?: number;
 }
 
 /** Qwen3 계열 thinking 블록 제거 (enable_thinking=false와 이중 안전장치) */
@@ -113,7 +115,7 @@ async function generateWebllm(
   const chunks = await engine.chat.completions.create({
     messages: [{ role: "system", content: system }, ...messages],
     stream: true,
-    temperature: 0.7,
+    temperature: opts.temperature ?? 0.7,
     max_tokens: 1024,
     extra_body: { enable_thinking: false },
   });
@@ -146,6 +148,7 @@ async function generateOllama(
       messages: [{ role: "system", content: system }, ...messages],
       stream: true,
       think: false,
+      options: { temperature: opts.temperature ?? 0.7 },
     }),
   });
   if (!res.ok || !res.body) {

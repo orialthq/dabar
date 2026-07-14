@@ -12,6 +12,7 @@ import { navigate } from "../lib/router";
 import VerseQuote from "../components/VerseQuote";
 import VersePicker from "../components/VersePicker";
 import VerseSuggest from "../components/VerseSuggest";
+import MeditationPrompt from "../components/MeditationPrompt";
 
 interface Props {
   entryId?: string; // 없으면 새 새김
@@ -160,6 +161,18 @@ function Editor({ entryId }: Props) {
               + 말씀 붙이기
             </button>
           )}
+        </div>
+        <div>
+          <MeditationPrompt
+            body={draft.body}
+            verses={draft.verses}
+            onAppend={(q) =>
+              setDraft((d) => ({
+                ...d,
+                body: `${d.body.trimEnd()}\n\n${q}\n`,
+              }))
+            }
+          />
         </div>
       </div>
 

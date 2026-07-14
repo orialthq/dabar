@@ -34,14 +34,15 @@ M4는 BYOK(Anthropic API)로 AI를 얹었다. 그러나 타겟(일반 교인)에
 4. **UI**: `src/components/VerseSuggest.tsx` 신규(M4 코드는 리포에 없어 교체가 아닌 신규 작성). "이 하루에 닿는 말씀 찾기" UX.
 5. **폴백**: 모델 로드 실패/거부/미지원 시 기존 키워드 검색(VersePicker)으로 안내. 기능 전체가 죽지 않음.
 
-### M5b — WebLLM 챗 레이어 (선택적)
-1. **엔진 추상화** (`src/lib/engine.ts`): `generate(system, messages) → text` 인터페이스 하나로 통일. 구현체 3종:
-   - `webllm`: @mlc-ai/web-llm, 기본 모델 **Qwen3-4B**(Apache 2.0, MLC 프리빌드 존재 여부 우선 확인; 없으면 Qwen2.5-3B-Instruct). 한국어 특화 후보(Kanana nano 계열)는 라이선스 및 MLC 변환 가능성 검증 후 교체 검토.
-   - `ollama`: http://localhost:11434 (개발·파워유저용, 모델명 설정 가능)
-   - `anthropic`: 기존 M4 BYOK 코드 이전 (옵션으로 존치)
-   - 설정 화면에서 엔진 선택. 기본값 webllm.
-2. **역전된 RAG**: LLM에게 참조를 묻지 않는다. ① 사용자 입력을 임베딩 검색 → 관련 절 top-k를 **본문 포함** 프롬프트에 공급 ② LLM은 공급된 절 안에서만 근거를 골라 답변 ③ 답변 내 구절 인용은 여전히 금지, 참조 표기만 → 앱이 로컬 DB로 렌더링(기존 resolveRefs 재사용).
-3. **묻다 / 묵상 질문**: 위 구조로 재구현. WebGPU 미지원 브라우저에서는 묻다 진입 시 안내 + 비활성.
+### M5b — WebLLM 챗 레이어 (선택적) — 2026-07-14 구현 완료
+1. **엔진 추상화** (`src/lib/engine.ts`): `generate(system, messages) → text` + 스트리밍/진행률/temperature 옵션. 구현체 3종:
+   - `webllm`: @mlc-ai/web-llm 0.2.84, 기본 **Qwen3-4B-q4f16_1-MLC** (프리빌드 확인, ~2.3GB·VRAM 3.4GB). 설정에서 Qwen3.5-4B / Qwen3-1.7B 선택 가능. thinking은 enable_thinking=false + `<think>` 스트립 이중 차단. Kanana nano는 MLC 프리빌드 부재로 보류.
+   - `ollama`: 주소·모델명 설정 가능 (개발·파워유저용)
+   - `anthropic`: BYOK 신규 작성 (M4 코드 리포 부재 — 옵션으로 존치, 외부 전송 명시)
+   - `src/pages/Settings.tsx`(#/settings)에서 선택. 기본값 webllm.
+2. **역전된 RAG** (`src/lib/ask.ts` + `semantic.ts retrieveForAsk`): ① 질문 임베딩 → 1위 주제 큐레이션 3 + 시맨틱 5절을 **본문 포함** 프롬프트 공급 ② LLM은 그 안에서만 근거 ③ 답변 내 인용 금지, "(책 장:절)" 참조만 → `resolveRefs`가 **공급 목록 화이트리스트 + DB 실존** 이중 검증 후 로컬 DB 렌더링.
+3. **묻다** (`src/pages/Ask.tsx`, #/ask): 스트리밍 챗, 최초 다운로드 동의·진행률, WebGPU 미지원 시 안내 + 대체 엔진 유도. **묵상 질문** (`src/lib/meditate.ts` + Editor의 MeditationPrompt): 첨부 구절+기록 → 열린 질문 2~3개, "담기"로 본문에 덧붙임.
+4. 관찰: Qwen3-4B 한국어가 간혹 어색(오타·영어 혼입) — temperature 0.5(묵상)로 보정, 필요 시 Qwen3.5-4B 승격 검토.
 
 ## 2. 불변 조건 (변경 없음)
 - 구절 본문은 항상 로컬 성경 DB에서만 렌더링. LLM 생성/복사 본문 표시 금지.
