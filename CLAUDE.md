@@ -2,34 +2,40 @@
 
 ## 프로젝트 개요
 다바르(dabar): 일상을 쓰면 성경이 답하는 신앙 기록 웹앱. OriAlt(오리알트) 프로덕트.
-스택: Vite + React 18 + TypeScript strict + Tailwind CSS 4. GitHub Pages 배포. 100% 클라이언트 사이드, 비용 0원.
+스택: Vite + React 18 + TypeScript strict + Tailwind CSS 4. GitHub Pages 배포(`orialthq.github.io/dabar`). 100% 클라이언트 사이드, 비용 0원, 서버 없음.
+
+네 가지 동사 = 제품 전체: **읽다**(개역한글 리더) · **찾다**(키워드 검색) · **묻다**(대화) · **새기다**(신앙 저널, 킬러 기능).
 
 ## 절대 규칙 (Do Not)
-1. **성경 구절을 LLM이 생성/암기로 출력하는 코드 금지.** 구절은 반드시 로컬 JSON DB에서 조회해 원문 그대로 렌더링한다. 요약·의역·재구성 표시 금지.
-2. 본문 변형 금지(동일성유지권). 맞춤법 교정, 띄어쓰기 수정도 금지.
-3. 역본은 개역한글판만. 개역개정 등 타 역본 데이터 추가 금지(라이선스 필요).
-4. 백엔드/서버 의존 코드 금지. Cloud Functions, DB 서버 없음. 저장은 localStorage.
-5. 사용자 API 키는 localStorage에만 저장, 외부 전송은 Anthropic/OpenAI API 호출 외 금지.
+1. **성경 구절 본문을 LLM이 생성하거나 LLM 출력에서 복사해 표시하는 코드 금지.** 구절은 반드시 `public/bible/` 로컬 DB에서 조회해 원문 그대로 렌더링. LLM/검색은 참조(bookId, 장, 절)만 공급한다.
+2. 본문 무변형(동일성유지권). 트림·맞춤법 교정·공백 정규화 금지. "세째", "한곳" 등 1961년 표기는 원문이다.
+3. 역본은 개역한글판만. 타 역본 데이터 추가 금지(라이선스 필요).
+4. 백엔드/서버/DB 서버 의존 코드 금지. 저장은 localStorage. 외부 네트워크 호출은 (a) 모델/임베딩 파일 다운로드 (b) 사용자가 설정에서 명시 선택한 엔진 호출, 이 둘뿐.
+5. 교단 중립. 구원론·은사·종말론 등 갈리는 주제에서 특정 입장 단정 금지, 스스로 상고하도록 유도.
 6. 마일스톤 범위를 넘는 구현 금지. 각 마일스톤 완료 시 멈추고 확인받는다.
 
-## 컨벤션
-- TypeScript strict, `any` 금지
-- 컴포넌트: 함수형 + hooks, 파일당 하나, PascalCase
-- 스타일: Tailwind 유틸리티 우선. 토큰은 `src/index.css`의 `@theme` 참조 (ink/hanji/dawn/mist)
-- 커밋: `feat:`, `fix:`, `chore:`, `docs:` prefix, 한국어 본문 허용
-- 성경 데이터 타입: `src/types/bible.ts`에 집중 (M2에서 생성)
+## 아키텍처 요점
+- 성경 데이터: `public/bible/books.json` + `{id}.json` (66권, 31,102절, 무결성 검증 완료 — 출처와 검증 과정은 `scripts/DATA.md`)
+- 라우팅: 해시 기반 (`src/lib/router.ts`) — #/read, #/search, #/ask, #/write, #/settings
+- 새김: 참조만 저장(본문 저장 금지), 렌더 시 DB 해석 (`src/lib/journal.ts`)
+- AI(M5 전환 중): 말씀 추천 = **임베딩 시맨틱 검색**(생성 아님), 챗 = 엔진 추상화(webllm 기본 / ollama / anthropic BYOK 존치). 상세는 `SPEC-M5.md`
+- M4의 참조 검증 패턴(`resolveRefs`: AI 참조 → DB 대조 → 무효 폐기)은 챗 레이어에서 계속 사용
 
-## 디자인 토큰
-ink #10151F · ink-soft #1B2230 · hanji #F7F3EA · hanji-dim #EFE9DB · dawn #D98E32 · mist #8A94A6
-폰트: Noto Serif KR(디스플레이/말씀) · Pretendard(본문)
-말씀 인용 블록은 항상 serif + 출처 표기(책 장:절, 개역한글).
+## 컨벤션
+- TypeScript strict, `any` 금지. 컴포넌트 함수형+hooks, 파일당 하나, PascalCase
+- Tailwind 유틸리티 우선. 토큰: ink #10151F · ink-soft #1B2230 · hanji #F7F3EA · hanji-dim #EFE9DB · dawn #D98E32 · mist #8A94A6
+- 폰트: Noto Serif KR(말씀·디스플레이) · Pretendard(본문). 말씀 인용 블록은 serif + 출처 표기 "(책 장:절, 개역한글)"
+- 커밋: `feat:`/`fix:`/`chore:`/`docs:` prefix, 한국어 본문 허용
+- 검증: 빌드(`npm run build`) 통과 + SPEC-M5 §3 검증 기준 충족 후 마일스톤 종료
 
 ## 배포
-- `main` push → GitHub Actions → Pages 자동 배포
-- vite base: `/dabar/` (커스텀 도메인 전환 시 `/` + public/CNAME)
+- `main` push → GitHub Actions → GitHub Pages. vite base `/dabar/` (커스텀 도메인 전환 시 `/` + public/CNAME)
+- 대용량 파일: 임베딩 샤드·모델은 GitHub 파일 100MB 제한 미만 유지. 모델 자체는 HuggingFace CDN에서 로드(리포에 넣지 않음)
 
 ## 마일스톤 현황
-- [x] M1 스캐폴드 + 랜딩 셸 + 배포 파이프라인
-- [x] M2 개역한글 데이터 + 리더 + 검색 (데이터 출처: scripts/DATA.md)
-- [x] M3 새김 기록 (localStorage + 초안 자동저장 + 마크다운 export)
-- [ ] M4 AI 연결 (BYOK)
+- [x] M1 스캐폴드 + 랜딩 + 배포 파이프라인
+- [x] M2 개역한글 데이터 + 리더 + 검색
+- [x] M3 새기다 — 기록 + 말씀 첨부 + 타임라인 + 마크다운 내보내기
+- [x] M4 AI 연결 (BYOK) — 말씀 추천 + 묻다, 참조 전용 RAG
+- [ ] M5a 임베딩 기반 말씀 추천 (로컬, 전 사용자)
+- [ ] M5b WebLLM 챗 레이어 + 엔진 추상화
