@@ -18,7 +18,7 @@
 - 성경 데이터: `public/bible/books.json` + `{id}.json` (66권, 31,102절, 무결성 검증 완료 — 출처와 검증 과정은 `scripts/DATA.md`)
 - 라우팅: 해시 기반 (`src/lib/router.ts`) — #/read, #/search, #/ask, #/write, #/settings
 - 새김: 참조만 저장(본문 저장 금지), 렌더 시 DB 해석 (`src/lib/journal.ts`)
-- AI(M5 전환 중): 말씀 추천 = **임베딩 시맨틱 검색**(생성 아님), 챗 = 엔진 추상화(webllm 기본 / ollama / anthropic BYOK 존치). 상세는 `SPEC-M5.md`
+- AI(M5 전환 중): 말씀 추천 = **주제 앵커 하이브리드**(주제 분류 → 큐레이션 `scripts/themes.json` + 전 절 시맨틱 "발견" 슬롯 — 순수 dense는 골든셋 0/10 실측으로 기각, SPEC-M5 §5), 챗 = 엔진 추상화(webllm 기본 / ollama / anthropic BYOK 존치). 상세는 `SPEC-M5.md`
 - M4의 참조 검증 패턴(`resolveRefs`: AI 참조 → DB 대조 → 무효 폐기)은 챗 레이어에서 계속 사용
 
 ## 컨벤션
@@ -37,5 +37,5 @@
 - [x] M2 개역한글 데이터 + 리더 + 검색
 - [x] M3 새기다 — 기록 + 말씀 첨부 + 타임라인 + 마크다운 내보내기
 - [x] M4 AI 연결 (BYOK) — 말씀 추천 + 묻다, 참조 전용 RAG
-- [ ] M5a 임베딩 기반 말씀 추천 (로컬, 전 사용자)
+- [ ] M5a 하이브리드 말씀 추천 (로컬, 전 사용자) — 구현·검증 완료, 사용자 확인 대기
 - [ ] M5b WebLLM 챗 레이어 + 엔진 추상화
