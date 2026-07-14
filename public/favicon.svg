@@ -1,4 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- 다바르 마크 — 달렛(דּ) + 기록 줄. build/icon.svg와 동일 지오메트리 (폰트 의존 없음) -->
   <rect width="64" height="64" rx="14" fill="#10151F"/>
-  <text x="32" y="44" font-family="Georgia, 'Noto Serif KR', serif" font-size="34" font-weight="700" fill="#D98E32" text-anchor="middle">ד</text>
+  <g fill="#D98E32">
+    <rect x="18" y="18" width="28" height="7.5" rx="1.5"/>
+    <rect x="37.5" y="23" width="7.5" height="22" rx="1.5"/>
+    <circle cx="29" cy="34.5" r="3"/>
+  </g>
+  <rect x="18" y="50" width="28" height="1.6" rx="0.8" fill="#F7F3EA" opacity="0.45"/>
 </svg>

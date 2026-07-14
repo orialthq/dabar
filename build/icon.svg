@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <!-- 다바르 앱 아이콘 — 달렛(דּ, 말씀) + 기록 줄. 폰트 의존 없이 전부 패스. -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1B2230"/>
+      <stop offset="1" stop-color="#0C1018"/>
+    </linearGradient>
+  </defs>
+
+  <!-- macOS Big Sur 그리드: 1024 캔버스에 824 라운드 사각 -->
+  <rect x="100" y="100" width="824" height="824" rx="186" fill="url(#bg)"/>
+
+  <!-- 달렛: 가로 획 + 오른쪽 끝 세로 획 (코너), 왼쪽으로 길게 뻗은 지붕 -->
+  <g fill="#D98E32">
+    <rect x="300" y="312" width="424" height="112" rx="16"/>
+    <rect x="596" y="392" width="112" height="332" rx="16"/>
+    <!-- 다게쉬(דּ) — 글자 품 안의 점 -->
+    <circle cx="465" cy="560" r="46"/>
+  </g>
+
+  <!-- 기록 줄 (새기다) — 한지색 가는 줄 -->
+  <rect x="300" y="788" width="424" height="12" rx="6" fill="#F7F3EA" opacity="0.45"/>
+</svg>
