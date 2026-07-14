@@ -11,6 +11,7 @@ import {
 import { navigate } from "../lib/router";
 import VerseQuote from "../components/VerseQuote";
 import VersePicker from "../components/VersePicker";
+import VerseSuggest from "../components/VerseSuggest";
 
 interface Props {
   entryId?: string; // 없으면 새 새김
@@ -135,22 +136,31 @@ function Editor({ entryId }: Props) {
         </div>
       )}
 
-      <div className="mt-8">
-        {showPicker ? (
-          <VersePicker
-            onPick={(ref) => {
-              addVerse(ref);
-              setShowPicker(false);
-            }}
+      <div className="mt-8 space-y-3">
+        <div>
+          <VerseSuggest
+            body={draft.body}
+            onPick={addVerse}
+            onFallback={() => setShowPicker(true)}
           />
-        ) : (
-          <button
-            onClick={() => setShowPicker(true)}
-            className="text-sm text-dawn hover:brightness-110"
-          >
-            + 말씀 붙이기
-          </button>
-        )}
+        </div>
+        <div>
+          {showPicker ? (
+            <VersePicker
+              onPick={(ref) => {
+                addVerse(ref);
+                setShowPicker(false);
+              }}
+            />
+          ) : (
+            <button
+              onClick={() => setShowPicker(true)}
+              className="text-sm text-dawn hover:brightness-110"
+            >
+              + 말씀 붙이기
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="mt-12 flex items-center gap-3">

@@ -1,0 +1,482 @@
+{
+  "comment": "주제 앵커 큐레이션. anchors = 일기체 예문(임베딩 매칭용), verses = 큐레이션 구절 참조(우선순위 순). 본문은 저장하지 않는다 — 렌더링은 항상 로컬 DB.",
+  "themes": [
+    {
+      "id": "anxiety",
+      "label": "불안과 염려",
+      "anchors": [
+        "걱정이 많아서 마음이 불안하고 초조하다",
+        "앞으로 일이 어떻게 될지 몰라 두렵다",
+        "결과를 기다리는데 마음이 조마조마해서 잠이 안 온다",
+        "머릿속이 걱정으로 가득하다"
+      ],
+      "verses": [
+        { "bookId": "php", "chapter": 4, "verse": 6 },
+        { "bookId": "mat", "chapter": 6, "verse": 34 },
+        { "bookId": "1pe", "chapter": 5, "verse": 7 },
+        { "bookId": "psa", "chapter": 56, "verse": 3 },
+        { "bookId": "mat", "chapter": 6, "verse": 26 }
+      ]
+    },
+    {
+      "id": "fear",
+      "label": "두려움",
+      "anchors": [
+        "무서운 일이 닥칠 것 같아 겁이 난다",
+        "혼자 감당하기에 너무 두렵다",
+        "겁이 나서 발이 떨어지지 않는다"
+      ],
+      "verses": [
+        { "bookId": "isa", "chapter": 41, "verse": 10 },
+        { "bookId": "psa", "chapter": 27, "verse": 1 },
+        { "bookId": "2ti", "chapter": 1, "verse": 7 },
+        { "bookId": "psa", "chapter": 23, "verse": 4 },
+        { "bookId": "jhn", "chapter": 14, "verse": 27 }
+      ]
+    },
+    {
+      "id": "sorrow",
+      "label": "슬픔과 눈물",
+      "anchors": [
+        "너무 슬퍼서 눈물이 멈추지 않는다",
+        "마음이 아파서 아무것도 손에 잡히지 않는다",
+        "가슴이 미어지는 하루였다"
+      ],
+      "verses": [
+        { "bookId": "psa", "chapter": 34, "verse": 18 },
+        { "bookId": "mat", "chapter": 5, "verse": 4 },
+        { "bookId": "psa", "chapter": 30, "verse": 5 },
+        { "bookId": "psa", "chapter": 126, "verse": 5 },
+        { "bookId": "rev", "chapter": 21, "verse": 4 }
+      ]
+    },
+    {
+      "id": "loss",
+      "label": "이별과 상실",
+      "anchors": [
+        "사랑하는 사람을 떠나보냈다",
+        "장례를 치르고 돌아왔다. 빈자리가 크다",
+        "다시 볼 수 없다는 것이 믿기지 않는다"
+      ],
+      "verses": [
+        { "bookId": "psa", "chapter": 73, "verse": 26 },
+        { "bookId": "jhn", "chapter": 11, "verse": 25 },
+        { "bookId": "1th", "chapter": 4, "verse": 13 },
+        { "bookId": "psa", "chapter": 34, "verse": 18 },
+        { "bookId": "2co", "chapter": 1, "verse": 3 }
+      ]
+    },
+    {
+      "id": "sickness",
+      "label": "질병과 간병",
+      "anchors": [
+        "몸이 아파서 병원에 다녀왔다",
+        "가족이 편찮으셔서 밤새 간호했다",
+        "검사 결과를 기다리고 있다. 건강이 걱정된다"
+      ],
+      "verses": [
+        { "bookId": "psa", "chapter": 103, "verse": 3 },
+        { "bookId": "jer", "chapter": 30, "verse": 17 },
+        { "bookId": "psa", "chapter": 41, "verse": 3 },
+        { "bookId": "jas", "chapter": 5, "verse": 15 },
+        { "bookId": "psa", "chapter": 121, "verse": 2 }
+      ]
+    },
+    {
+      "id": "fatigue",
+      "label": "지침과 피로",
+      "anchors": [
+        "일이 많아서 지치고 피곤하다",
+        "몸도 마음도 소진되어 무기력하다",
+        "쉬고 싶다. 힘이 하나도 없다",
+        "야근이 이어져 녹초가 되었다"
+      ],
+      "verses": [
+        { "bookId": "mat", "chapter": 11, "verse": 28 },
+        { "bookId": "isa", "chapter": 40, "verse": 31 },
+        { "bookId": "psa", "chapter": 62, "verse": 1 },
+        { "bookId": "isa", "chapter": 40, "verse": 29 },
+        { "bookId": "psa", "chapter": 23, "verse": 2 }
+      ]
+    },
+    {
+      "id": "loneliness",
+      "label": "외로움",
+      "anchors": [
+        "혼자인 것 같아 외롭다",
+        "낯선 곳에서 아는 사람이 없어 쓸쓸하다",
+        "곁에 아무도 없는 것처럼 느껴진다"
+      ],
+      "verses": [
+        { "bookId": "psa", "chapter": 25, "verse": 16 },
+        { "bookId": "deu", "chapter": 31, "verse": 8 },
+        { "bookId": "jos", "chapter": 1, "verse": 9 },
+        { "bookId": "psa", "chapter": 139, "verse": 9 },
+        { "bookId": "mat", "chapter": 28, "verse": 20 }
+      ]
+    },
+    {
+      "id": "gratitude",
+      "label": "감사",
+      "anchors": [
+        "바라던 일이 이루어져서 감사하다",
+        "기도가 응답되어 기쁘고 감사한 마음이다",
+        "돌아보니 감사한 일이 많은 하루였다"
+      ],
+      "verses": [
+        { "bookId": "1th", "chapter": 5, "verse": 18 },
+        { "bookId": "psa", "chapter": 103, "verse": 2 },
+        { "bookId": "psa", "chapter": 100, "verse": 4 },
+        { "bookId": "psa", "chapter": 118, "verse": 1 },
+        { "bookId": "col", "chapter": 3, "verse": 17 }
+      ]
+    },
+    {
+      "id": "joy",
+      "label": "기쁨과 경사",
+      "anchors": [
+        "좋은 일이 생겨서 기쁘다",
+        "축하할 일이 있어 마음이 들뜬다",
+        "웃음이 나는 행복한 하루였다"
+      ],
+      "verses": [
+        { "bookId": "psa", "chapter": 118, "verse": 24 },
+        { "bookId": "php", "chapter": 4, "verse": 4 },
+        { "bookId": "neh", "chapter": 8, "verse": 10 },
+        { "bookId": "psa", "chapter": 16, "verse": 11 }
+      ]
+    },
+    {
+      "id": "conflict",
+      "label": "갈등과 분노",
+      "anchors": [
+        "사람과 다투고 나서 화가 나고 마음이 상했다",
+        "관계가 틀어져서 미움과 분노가 올라온다",
+        "누군가와 싸웠다. 화가 가라앉지 않는다"
+      ],
+      "verses": [
+        { "bookId": "eph", "chapter": 4, "verse": 26 },
+        { "bookId": "pro", "chapter": 15, "verse": 1 },
+        { "bookId": "jas", "chapter": 1, "verse": 19 },
+        { "bookId": "rom", "chapter": 12, "verse": 18 },
+        { "bookId": "mat", "chapter": 5, "verse": 24 }
+      ]
+    },
+    {
+      "id": "forgiveness",
+      "label": "용서",
+      "anchors": [
+        "그 사람을 용서하기가 어렵다",
+        "용서해야 한다는 걸 알지만 마음이 따라주지 않는다",
+        "상처를 준 사람이 자꾸 생각난다"
+      ],
+      "verses": [
+        { "bookId": "eph", "chapter": 4, "verse": 32 },
+        { "bookId": "col", "chapter": 3, "verse": 13 },
+        { "bookId": "mat", "chapter": 6, "verse": 14 },
+        { "bookId": "mat", "chapter": 18, "verse": 21 }
+      ]
+    },
+    {
+      "id": "guilt",
+      "label": "죄책과 회개",
+      "anchors": [
+        "잘못을 저질러서 마음이 괴롭다",
+        "죄책감에 마음이 무겁다. 용서받고 싶다",
+        "부끄러운 일을 했다. 후회가 된다"
+      ],
+      "verses": [
+        { "bookId": "1jn", "chapter": 1, "verse": 9 },
+        { "bookId": "psa", "chapter": 51, "verse": 10 },
+        { "bookId": "pro", "chapter": 28, "verse": 13 },
+        { "bookId": "psa", "chapter": 32, "verse": 5 },
+        { "bookId": "isa", "chapter": 1, "verse": 18 }
+      ]
+    },
+    {
+      "id": "decision",
+      "label": "결정과 진로",
+      "anchors": [
+        "중요한 선택을 앞두고 어떻게 해야 할지 모르겠다",
+        "갈림길에 서 있다. 지혜가 필요하다",
+        "이직이나 진로 문제로 고민이 깊다"
+      ],
+      "verses": [
+        { "bookId": "pro", "chapter": 3, "verse": 5 },
+        { "bookId": "psa", "chapter": 32, "verse": 8 },
+        { "bookId": "jas", "chapter": 1, "verse": 5 },
+        { "bookId": "pro", "chapter": 16, "verse": 9 },
+        { "bookId": "psa", "chapter": 37, "verse": 5 }
+      ]
+    },
+    {
+      "id": "waiting",
+      "label": "기다림과 인내",
+      "anchors": [
+        "기다리는 시간이 길어져 지친다",
+        "응답이 없는 것 같아 답답하다",
+        "언제까지 견뎌야 할지 모르겠다"
+      ],
+      "verses": [
+        { "bookId": "isa", "chapter": 40, "verse": 31 },
+        { "bookId": "psa", "chapter": 27, "verse": 14 },
+        { "bookId": "lam", "chapter": 3, "verse": 25 },
+        { "bookId": "gal", "chapter": 6, "verse": 9 },
+        { "bookId": "rom", "chapter": 8, "verse": 25 }
+      ]
+    },
+    {
+      "id": "finance",
+      "label": "재정과 생계",
+      "anchors": [
+        "돈이 부족해서 걱정이 크다",
+        "생활비가 빠듯해 마음이 눌린다",
+        "먹고사는 문제가 막막하다"
+      ],
+      "verses": [
+        { "bookId": "mat", "chapter": 6, "verse": 26 },
+        { "bookId": "php", "chapter": 4, "verse": 19 },
+        { "bookId": "psa", "chapter": 37, "verse": 25 },
+        { "bookId": "mat", "chapter": 6, "verse": 33 },
+        { "bookId": "pro", "chapter": 30, "verse": 8 }
+      ]
+    },
+    {
+      "id": "work",
+      "label": "일과 직장",
+      "anchors": [
+        "회사 일이 잘 풀리지 않는다",
+        "맡은 일을 잘 해내고 싶다",
+        "직장에서 인정받지 못하는 것 같다"
+      ],
+      "verses": [
+        { "bookId": "col", "chapter": 3, "verse": 23 },
+        { "bookId": "pro", "chapter": 16, "verse": 3 },
+        { "bookId": "ecc", "chapter": 9, "verse": 10 },
+        { "bookId": "psa", "chapter": 90, "verse": 17 }
+      ]
+    },
+    {
+      "id": "family",
+      "label": "가정과 자녀",
+      "anchors": [
+        "아이 때문에 걱정이 많다",
+        "부모님 생각에 마음이 쓰인다",
+        "가족과 함께한 시간이 소중하게 느껴진다"
+      ],
+      "verses": [
+        { "bookId": "psa", "chapter": 127, "verse": 3 },
+        { "bookId": "pro", "chapter": 22, "verse": 6 },
+        { "bookId": "deu", "chapter": 6, "verse": 6 },
+        { "bookId": "psa", "chapter": 128, "verse": 3 },
+        { "bookId": "eph", "chapter": 6, "verse": 4 }
+      ]
+    },
+    {
+      "id": "love",
+      "label": "사랑과 부부",
+      "anchors": [
+        "배우자와 마음이 통하지 않는 것 같다",
+        "사랑한다는 것이 무엇인지 생각하게 된다",
+        "소중한 사람에게 더 잘하고 싶다"
+      ],
+      "verses": [
+        { "bookId": "1co", "chapter": 13, "verse": 4 },
+        { "bookId": "eph", "chapter": 4, "verse": 2 },
+        { "bookId": "ecc", "chapter": 4, "verse": 9 },
+        { "bookId": "1pe", "chapter": 4, "verse": 8 },
+        { "bookId": "1jn", "chapter": 4, "verse": 19 }
+      ]
+    },
+    {
+      "id": "community",
+      "label": "관계와 공동체",
+      "anchors": [
+        "사람들과의 관계가 어렵게 느껴진다",
+        "좋은 친구가 있어 든든했다",
+        "함께하는 사람들에게 고마움을 느낀다"
+      ],
+      "verses": [
+        { "bookId": "jhn", "chapter": 13, "verse": 34 },
+        { "bookId": "rom", "chapter": 12, "verse": 10 },
+        { "bookId": "pro", "chapter": 17, "verse": 17 },
+        { "bookId": "ecc", "chapter": 4, "verse": 10 },
+        { "bookId": "heb", "chapter": 10, "verse": 24 }
+      ]
+    },
+    {
+      "id": "failure",
+      "label": "실패와 좌절",
+      "anchors": [
+        "열심히 했는데 결과가 좋지 않았다",
+        "실수를 해서 자신감이 떨어졌다",
+        "넘어진 것 같아 일어설 힘이 없다"
+      ],
+      "verses": [
+        { "bookId": "psa", "chapter": 37, "verse": 24 },
+        { "bookId": "pro", "chapter": 24, "verse": 16 },
+        { "bookId": "mic", "chapter": 7, "verse": 8 },
+        { "bookId": "2co", "chapter": 4, "verse": 8 },
+        { "bookId": "php", "chapter": 3, "verse": 13 }
+      ]
+    },
+    {
+      "id": "hope",
+      "label": "소망과 새 시작",
+      "anchors": [
+        "새로운 시작 앞에 서 있다",
+        "다시 시작할 수 있을까 하는 마음이 든다",
+        "내일은 더 나아지기를 바란다"
+      ],
+      "verses": [
+        { "bookId": "jer", "chapter": 29, "verse": 11 },
+        { "bookId": "lam", "chapter": 3, "verse": 22 },
+        { "bookId": "isa", "chapter": 43, "verse": 19 },
+        { "bookId": "2co", "chapter": 5, "verse": 17 },
+        { "bookId": "php", "chapter": 1, "verse": 6 }
+      ]
+    },
+    {
+      "id": "courage",
+      "label": "도전과 용기",
+      "anchors": [
+        "새로운 일에 도전하려니 용기가 필요하다",
+        "잘 해낼 수 있을지 떨린다",
+        "큰일을 앞두고 마음을 다잡는다"
+      ],
+      "verses": [
+        { "bookId": "jos", "chapter": 1, "verse": 9 },
+        { "bookId": "php", "chapter": 4, "verse": 13 },
+        { "bookId": "deu", "chapter": 31, "verse": 6 },
+        { "bookId": "isa", "chapter": 41, "verse": 10 },
+        { "bookId": "psa", "chapter": 18, "verse": 32 }
+      ]
+    },
+    {
+      "id": "temptation",
+      "label": "유혹과 연약함",
+      "anchors": [
+        "하지 말아야 할 일에 자꾸 마음이 간다",
+        "같은 잘못을 반복하는 내가 한심하다",
+        "마음이 약해져서 흔들린다"
+      ],
+      "verses": [
+        { "bookId": "1co", "chapter": 10, "verse": 13 },
+        { "bookId": "heb", "chapter": 4, "verse": 16 },
+        { "bookId": "jas", "chapter": 4, "verse": 7 },
+        { "bookId": "psa", "chapter": 119, "verse": 11 }
+      ]
+    },
+    {
+      "id": "doubt",
+      "label": "믿음과 의심",
+      "anchors": [
+        "하나님이 정말 계신지 의심이 든다",
+        "믿음이 흔들리는 것 같다",
+        "기도해도 달라지는 게 없는 것 같다"
+      ],
+      "verses": [
+        { "bookId": "mrk", "chapter": 9, "verse": 24 },
+        { "bookId": "heb", "chapter": 11, "verse": 1 },
+        { "bookId": "mrk", "chapter": 11, "verse": 24 },
+        { "bookId": "rom", "chapter": 10, "verse": 17 },
+        { "bookId": "psa", "chapter": 42, "verse": 5 }
+      ]
+    },
+    {
+      "id": "prayer",
+      "label": "기도",
+      "anchors": [
+        "무엇을 어떻게 기도해야 할지 모르겠다",
+        "오랜만에 마음을 다해 기도했다",
+        "기도 제목이 생겼다"
+      ],
+      "verses": [
+        { "bookId": "mat", "chapter": 7, "verse": 7 },
+        { "bookId": "php", "chapter": 4, "verse": 6 },
+        { "bookId": "jer", "chapter": 33, "verse": 3 },
+        { "bookId": "psa", "chapter": 145, "verse": 18 },
+        { "bookId": "rom", "chapter": 8, "verse": 26 }
+      ]
+    },
+    {
+      "id": "word",
+      "label": "말씀과 묵상",
+      "anchors": [
+        "성경을 읽고 마음에 남는 것이 있었다",
+        "말씀대로 살고 싶다는 마음이 들었다",
+        "오늘 들은 설교가 계속 생각난다"
+      ],
+      "verses": [
+        { "bookId": "psa", "chapter": 119, "verse": 105 },
+        { "bookId": "jos", "chapter": 1, "verse": 8 },
+        { "bookId": "psa", "chapter": 1, "verse": 2 },
+        { "bookId": "2ti", "chapter": 3, "verse": 16 },
+        { "bookId": "heb", "chapter": 4, "verse": 12 }
+      ]
+    },
+    {
+      "id": "aging",
+      "label": "세월과 나이듦",
+      "anchors": [
+        "시간이 참 빠르게 지나간다",
+        "나이가 들어가는 것을 실감한다",
+        "지나온 세월을 돌아보게 된다"
+      ],
+      "verses": [
+        { "bookId": "psa", "chapter": 90, "verse": 12 },
+        { "bookId": "isa", "chapter": 46, "verse": 4 },
+        { "bookId": "ecc", "chapter": 3, "verse": 11 },
+        { "bookId": "psa", "chapter": 71, "verse": 18 }
+      ]
+    },
+    {
+      "id": "injustice",
+      "label": "억울함과 불의",
+      "anchors": [
+        "억울한 일을 당해서 분하다",
+        "정직하게 살았는데 손해 보는 것 같다",
+        "불공평한 세상에 화가 난다"
+      ],
+      "verses": [
+        { "bookId": "psa", "chapter": 37, "verse": 7 },
+        { "bookId": "rom", "chapter": 12, "verse": 19 },
+        { "bookId": "1pe", "chapter": 2, "verse": 23 },
+        { "bookId": "psa", "chapter": 43, "verse": 1 },
+        { "bookId": "mic", "chapter": 6, "verse": 8 }
+      ]
+    },
+    {
+      "id": "wonder",
+      "label": "경이와 감탄",
+      "anchors": [
+        "아이를 보며 생명의 신비를 느낀다",
+        "자연을 보며 감탄이 나왔다",
+        "놀랍고 경이로운 순간을 경험했다"
+      ],
+      "verses": [
+        { "bookId": "psa", "chapter": 139, "verse": 14 },
+        { "bookId": "psa", "chapter": 8, "verse": 4 },
+        { "bookId": "psa", "chapter": 19, "verse": 1 },
+        { "bookId": "jas", "chapter": 1, "verse": 17 },
+        { "bookId": "gen", "chapter": 1, "verse": 31 }
+      ]
+    },
+    {
+      "id": "peace",
+      "label": "평안과 쉼",
+      "anchors": [
+        "마음이 복잡해서 평안이 필요하다",
+        "조용히 쉬고 싶은 하루였다",
+        "마음의 안정을 찾고 싶다"
+      ],
+      "verses": [
+        { "bookId": "jhn", "chapter": 14, "verse": 27 },
+        { "bookId": "php", "chapter": 4, "verse": 7 },
+        { "bookId": "psa", "chapter": 4, "verse": 8 },
+        { "bookId": "isa", "chapter": 26, "verse": 3 },
+        { "bookId": "mat", "chapter": 11, "verse": 29 }
+      ]
+    }
+  ]
+}

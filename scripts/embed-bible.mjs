@@ -12,8 +12,7 @@ import { pipeline } from "@huggingface/transformers";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import path from "node:path";
 
-const MODEL = "Xenova/multilingual-e5-small";
-const DIM = 384;
+const DEFAULT_MODEL = "Xenova/multilingual-e5-small";
 const BATCH = 32;
 const SHARDS = 4;
 
@@ -26,6 +25,7 @@ function opt(name, fallback) {
 const onlyBook = opt("book", null);
 const variant = opt("variant", "verse"); // verse | context
 const outDir = opt("out", "public/embeddings");
+const MODEL = opt("model", DEFAULT_MODEL);
 if (!["verse", "context"].includes(variant)) {
   console.error(`알 수 없는 variant: ${variant}`);
   process.exit(1);
@@ -123,13 +123,20 @@ async function main() {
   console.log(`모델 로드 중: ${MODEL}`);
   const extractor = await pipeline("feature-extraction", MODEL, { dtype: "fp32" });
 
-  const int8 = new Int8Array(total * DIM);
+  // 차원은 첫 배치 출력에서 결정 (모델마다 다름: e5-small 384, e5-base 768, bge-m3 1024)
+  let DIM = 0;
+  let int8 = null;
   const scales = new Uint16Array(total); // float16 비트
   const t0 = Date.now();
 
   for (let i = 0; i < total; i += BATCH) {
     const batch = verses.slice(i, i + BATCH).map((v) => v.text);
     const out = await extractor(batch, { pooling: "mean", normalize: true });
+    if (!int8) {
+      DIM = out.dims[out.dims.length - 1];
+      int8 = new Int8Array(total * DIM);
+      console.log(`임베딩 차원: ${DIM}`);
+    }
     const data = out.data; // Float32Array [batch × DIM]
     for (let j = 0; j < batch.length; j++) {
       const off = j * DIM;

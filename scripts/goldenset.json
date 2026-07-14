@@ -1,0 +1,95 @@
+[
+  {
+    "id": "anxiety",
+    "query": "내일 면접인데 잠이 안 온다. 떨어질까봐 두렵다.",
+    "expect": [
+      { "bookId": "php", "chapter": 4, "verses": [6, 7] },
+      { "bookId": "isa", "chapter": 41, "verses": [10] },
+      { "bookId": "mat", "chapter": 6, "verses": [34] },
+      { "bookId": "1pe", "chapter": 5, "verses": [7] }
+    ]
+  },
+  {
+    "id": "grief-care",
+    "query": "어머니가 많이 편찮으시다. 병원에서 밤을 지새웠다.",
+    "expect": [
+      { "bookId": "psa", "chapter": 23, "verses": [4] },
+      { "bookId": "mat", "chapter": 11, "verses": [28] },
+      { "bookId": "psa", "chapter": 121, "verses": [1, 2] },
+      { "bookId": "2co", "chapter": 1, "verses": [3, 4] }
+    ]
+  },
+  {
+    "id": "gratitude",
+    "query": "오랜 기도 끝에 취업이 되었다. 감사하다.",
+    "expect": [
+      { "bookId": "1th", "chapter": 5, "verses": [18] },
+      { "bookId": "psa", "chapter": 103, "verses": [2] },
+      { "bookId": "psa", "chapter": 116, "verses": [12] }
+    ]
+  },
+  {
+    "id": "conflict",
+    "query": "직장 동료와 크게 다퉜다. 화가 가라앉지 않는다.",
+    "expect": [
+      { "bookId": "eph", "chapter": 4, "verses": [26] },
+      { "bookId": "pro", "chapter": 15, "verses": [1] },
+      { "bookId": "rom", "chapter": 12, "verses": [18] },
+      { "bookId": "mat", "chapter": 5, "verses": [23, 24] }
+    ]
+  },
+  {
+    "id": "decision",
+    "query": "이직 제안을 받았다. 어느 길이 맞는지 모르겠다.",
+    "expect": [
+      { "bookId": "pro", "chapter": 3, "verses": [5, 6] },
+      { "bookId": "psa", "chapter": 32, "verses": [8] },
+      { "bookId": "jas", "chapter": 1, "verses": [5] }
+    ]
+  },
+  {
+    "id": "fatigue",
+    "query": "야근이 계속된다. 몸도 마음도 지쳤다.",
+    "expect": [
+      { "bookId": "mat", "chapter": 11, "verses": [28] },
+      { "bookId": "isa", "chapter": 40, "verses": [31] },
+      { "bookId": "psa", "chapter": 62, "verses": [1] }
+    ]
+  },
+  {
+    "id": "loneliness",
+    "query": "낯선 도시로 이사 왔다. 아는 사람이 없다.",
+    "expect": [
+      { "bookId": "jos", "chapter": 1, "verses": [9] },
+      { "bookId": "psa", "chapter": 139, "verses": [9, 10] },
+      { "bookId": "deu", "chapter": 31, "verses": [8] }
+    ]
+  },
+  {
+    "id": "finance",
+    "query": "이번 달 생활비가 빠듯하다. 돈 걱정이 떠나지 않는다.",
+    "expect": [
+      { "bookId": "mat", "chapter": 6, "verses": [26] },
+      { "bookId": "php", "chapter": 4, "verses": [19] },
+      { "bookId": "psa", "chapter": 37, "verses": [25] }
+    ]
+  },
+  {
+    "id": "guilt",
+    "query": "오늘 거짓말을 했다. 마음이 무겁다.",
+    "expect": [
+      { "bookId": "1jn", "chapter": 1, "verses": [9] },
+      { "bookId": "psa", "chapter": 51, "verses": [10] },
+      { "bookId": "pro", "chapter": 28, "verses": [13] }
+    ]
+  },
+  {
+    "id": "wonder",
+    "query": "아이가 첫 걸음을 뗐다. 생명이 경이롭다.",
+    "expect": [
+      { "bookId": "psa", "chapter": 127, "verses": [3] },
+      { "bookId": "psa", "chapter": 139, "verses": [14] },
+      { "bookId": "jas", "chapter": 1, "verses": [17] }
+    ]
+  }
+]
