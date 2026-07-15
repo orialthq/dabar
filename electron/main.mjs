@@ -161,7 +161,8 @@ function registerUpdateIpc() {
         // 옛 번들 삭제는 베스트에포트 — 실행 중 프로세스가 잡고 있어도 다음 단계에 지장 없음.
         await execFileAsync("mv", ["/Applications/Dabar.app", aside]).catch(() => {});
         await execFileAsync("cp", ["-R", `${mnt}/Dabar.app`, "/Applications/"]);
-        rm(aside, { recursive: true, force: true }).catch(() => {});
+        // exit 전에 완료되도록 await (실행 중 프로세스의 번들 삭제는 POSIX에서 안전)
+        await rm(aside, { recursive: true, force: true }).catch(() => {});
       } finally {
         await execFileAsync("hdiutil", ["detach", mnt, "-quiet"]).catch(() => {});
         await rm(dmg, { force: true }).catch(() => {}); // 설치 파일 정리
@@ -179,8 +180,21 @@ function registerUpdateIpc() {
   });
 }
 
+/** 이전 업데이트가 미처 못 지운 옛 번들 청소 (mac) */
+async function sweepOldBundles() {
+  if (process.platform !== "darwin") return;
+  const { readdir } = await import("node:fs/promises");
+  const entries = await readdir("/Applications").catch(() => []);
+  for (const name of entries) {
+    if (name.startsWith(".Dabar-old-")) {
+      await rm(path.join("/Applications", name), { recursive: true, force: true }).catch(() => {});
+    }
+  }
+}
+
 app.whenReady().then(() => {
   registerUpdateIpc();
+  void sweepOldBundles();
   createWindow();
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
