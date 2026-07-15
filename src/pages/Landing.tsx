@@ -37,7 +37,8 @@ const isDesktop = typeof window !== "undefined" && Boolean(window.dabarDesktop);
 function Landing() {
   return (
     <div className="flex-1 flex flex-col">
-      <section className="px-6 md:px-12 pt-16 pb-24 md:pt-24 md:pb-32 max-w-4xl mx-auto text-center">
+      <section className="heaven w-full">
+        <div className="px-6 md:px-12 pt-16 pb-24 md:pt-24 md:pb-32 max-w-4xl mx-auto text-center">
         <p
           lang="he"
           dir="rtl"
@@ -94,6 +95,7 @@ function Landing() {
             "추가 정보 → 실행"을 누르면 됩니다.
           </p>
         )}
+        </div>
       </section>
 
       <section className="flex-1 paper text-ink px-6 md:px-12 py-20 md:py-28">
