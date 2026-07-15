@@ -213,8 +213,11 @@ async function sweepOldBundles() {
 
 app.whenReady().then(() => {
   registerUpdateIpc();
-  void sweepOldBundles();
   createWindow();
+  // 창을 띄운 뒤 여유를 두고 청소 — app.exit 계열 조기 종료와의 경쟁을 피한다
+  setTimeout(() => {
+    sweepOldBundles().catch((e) => console.error("sweep 실패:", e));
+  }, 5000);
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
