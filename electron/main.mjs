@@ -118,16 +118,35 @@ async function fetchLatest() {
   return { latest, assetUrl: asset?.browser_download_url ?? null, assetSize: asset?.size ?? 0 };
 }
 
+const DOWNLOAD_STALL_MS = 30_000;
+
 async function download(url, dest, onProgress) {
-  const res = await fetch(url);
-  if (!res.ok || !res.body) throw new Error(`다운로드 실패 (${res.status})`);
+  // 청크가 일정 시간 안 오면 중단 — 소리 없이 멈춘 스트림에 무한 대기하지 않는다 (실측 버그)
+  const ctrl = new AbortController();
+  let stallTimer = setTimeout(() => ctrl.abort(), DOWNLOAD_STALL_MS);
+  const res = await fetch(url, { signal: ctrl.signal });
+  if (!res.ok || !res.body) {
+    clearTimeout(stallTimer);
+    throw new Error(`다운로드 실패 (${res.status})`);
+  }
   const total = Number(res.headers.get("content-length")) || 0;
   const out = createWriteStream(dest);
   let done = 0;
-  for await (const chunk of res.body) {
-    out.write(chunk);
-    done += chunk.length;
-    onProgress?.(total > 0 ? done / total : 0);
+  try {
+    for await (const chunk of res.body) {
+      clearTimeout(stallTimer);
+      stallTimer = setTimeout(() => ctrl.abort(), DOWNLOAD_STALL_MS);
+      out.write(chunk);
+      done += chunk.length;
+      onProgress?.(total > 0 ? done / total : 0);
+    }
+  } catch (e) {
+    out.destroy();
+    await rm(dest, { force: true }).catch(() => {});
+    if (ctrl.signal.aborted) throw new Error("다운로드가 멈춰 중단했습니다. 다시 시도해 주세요.");
+    throw e;
+  } finally {
+    clearTimeout(stallTimer);
   }
   await new Promise((resolve, reject) => out.end((e) => (e ? reject(e) : resolve())));
 }

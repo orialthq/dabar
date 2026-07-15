@@ -70,7 +70,16 @@ function DesktopUpdate({ variant }: Props) {
           최신 버전입니다 (v{status.current})
         </span>
       );
-    return null; // idle/error: 조용히 숨김
+    if (status.kind === "error")
+      return (
+        <button
+          onClick={install}
+          className="border border-hanji/25 text-hanji rounded-full px-6 py-2.5 text-sm hover:border-dawn hover:text-dawn transition"
+        >
+          업데이트에 실패했습니다 — 다시 시도
+        </button>
+      );
+    return null;
   }
 
   // footer variant — 안 쓰는 공간에 작은 상태 표시
@@ -82,6 +91,12 @@ function DesktopUpdate({ variant }: Props) {
     );
   if (status.kind === "installing") return <span>업데이트 중 — {status.percent}%</span>;
   if (status.kind === "uptodate") return <span>v{status.current} · 최신</span>;
+  if (status.kind === "error")
+    return (
+      <button onClick={install} className="text-dawn hover:brightness-110">
+        업데이트 실패 · 다시 시도
+      </button>
+    );
   return null;
 }
 
