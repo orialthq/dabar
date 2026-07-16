@@ -44,7 +44,7 @@ function MeditationPrompt({ body, verses, onAppend }: Props) {
       if (!isWebGpuAvailable()) {
         setStatus({
           kind: "error",
-          message: "이 브라우저에서는 지원되지 않습니다. 설정에서 다른 엔진을 선택하세요.",
+          message: "이 브라우저에서는 열 수 없습니다. 설정에서 다른 응답 방식을 선택하세요.",
         });
         return;
       }

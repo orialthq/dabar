@@ -15,7 +15,7 @@ const ENGINES: { kind: EngineKind; name: string; desc: string }[] = [
   },
   {
     kind: "anthropic",
-    name: "Anthropic API (BYOK)",
+    name: "Anthropic API (내 키 사용)",
     desc: "내 API 키로 Anthropic에 연결합니다. 선택 시 질문 내용이 Anthropic 서버로 전송됩니다.",
   },
 ];
@@ -41,7 +41,7 @@ function Settings() {
     <div className="max-w-2xl mx-auto px-6 py-10 md:py-14">
       <h1 className="font-serif text-xl font-semibold">설정</h1>
       <p className="mt-1 text-xs text-ink/50">
-        묻다에서 사용할 엔진을 고릅니다. 말씀 추천(새기다)은 엔진과 무관하게 항상 기기 안에서 동작합니다.
+        묻다의 응답을 어디에서 만들지 고릅니다. 말씀 찾기(새기다)는 언제나 기기 안에서 동작합니다.
       </p>
 
       <div className="mt-6 space-y-3">

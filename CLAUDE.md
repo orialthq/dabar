@@ -25,6 +25,7 @@
 - TypeScript strict, `any` 금지. 컴포넌트 함수형+hooks, 파일당 하나, PascalCase
 - Tailwind 유틸리티 우선. 토큰: ink #10151F · ink-soft #1B2230 · hanji #F7F3EA · hanji-dim #EFE9DB · dawn #D98E32 · mist #8A94A6
 - 폰트: Noto Serif KR(말씀·디스플레이) · Pretendard(본문). 말씀 인용 블록은 serif + 출처 표기 "(책 장:절, 개역한글)"
+- 브랜드·문구 톤: `BRAND.md` — UI 문구 추가·수정 시 「문구 톤」 5원칙(동사 중심 어휘, 권유형 존댓말, 기술어 최소화, 오류는 다음 걸음 안내, 두 문장 이내)을 따른다
 - 커밋: `feat:`/`fix:`/`chore:`/`docs:` prefix, 한국어 본문 허용
 - 검증: 빌드(`npm run build`) 통과 + SPEC-M5 §3 검증 기준 충족 후 마일스톤 종료
 

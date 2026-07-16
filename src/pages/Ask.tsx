@@ -89,7 +89,7 @@ function Ask() {
       setTurns((ts) =>
         ts.map((t, i) =>
           i === ts.length - 1
-            ? { ...t, pending: false, error: e instanceof Error ? e.message : "오류가 발생했습니다" }
+            ? { ...t, pending: false, error: e instanceof Error ? e.message : "답을 만들지 못했습니다. 다시 물어봐 주세요." }
             : t
         )
       );
@@ -101,12 +101,12 @@ function Ask() {
       <div className="max-w-2xl mx-auto px-6 py-14">
         <h1 className="font-serif text-xl font-semibold">묻다</h1>
         <p className="mt-4 text-sm text-ink/70 leading-6">
-          기본 엔진(내 기기에서 실행)은 WebGPU 지원 브라우저가 필요한데, 이 브라우저에서는
+          기본 응답 방식(내 기기에서 실행)은 WebGPU 지원 브라우저가 필요한데, 이 브라우저에서는
           사용할 수 없습니다. 최신 Chrome/Edge/Safari로 열거나,{" "}
           <a href="#/settings" className="text-dawn">
             설정
           </a>
-          에서 다른 엔진(Ollama·Anthropic)을 선택하세요.
+          에서 다른 응답 방식(Ollama·Anthropic)을 선택하세요.
         </p>
         <p className="mt-3 text-xs text-ink/45">
           읽다·찾다·새기다(말씀 추천 포함)는 이 브라우저에서도 모두 동작합니다.
@@ -119,7 +119,7 @@ function Ask() {
       <div className="flex items-baseline justify-between">
         <h1 className="font-serif text-xl font-semibold">묻다</h1>
         <a href="#/settings" className="text-xs text-ink/40 hover:text-dawn">
-          엔진: {settings.kind === "webllm" ? "내 기기" : settings.kind} · 설정
+          응답 방식: {settings.kind === "webllm" ? "내 기기" : settings.kind === "ollama" ? "Ollama" : "Anthropic"} · 설정
         </a>
       </div>
       <p className="mt-1 text-xs text-ink/50">
@@ -142,7 +142,7 @@ function Ask() {
               알겠어요
             </button>
             <a href="#/settings" className="text-xs text-ink/40 hover:text-ink/70">
-              다른 엔진 쓰기
+              다른 응답 방식 쓰기
             </a>
           </div>
         </div>

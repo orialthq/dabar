@@ -186,7 +186,7 @@ function Editor({ entryId }: Props) {
         </button>
         {isNew && (
           <span className="text-[11px] text-ink/35">
-            초안은 자동으로 임시 저장됩니다.
+            쓰다 만 새김도 자동으로 간직됩니다.
           </span>
         )}
       </div>

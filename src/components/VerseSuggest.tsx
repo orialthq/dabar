@@ -73,7 +73,7 @@ function VerseSuggest({ body, onPick, onFallback }: Props) {
       if (!alive.current) return;
       setStatus({
         kind: "error",
-        message: "말씀 찾기를 불러오지 못했습니다. 아래 키워드 검색을 이용해 보세요.",
+        message: "말씀 찾기가 열리지 않았습니다. 아래에서 키워드로 직접 찾아보세요.",
       });
     }
   };
@@ -82,7 +82,7 @@ function VerseSuggest({ body, onPick, onFallback }: Props) {
     if (!isSemanticSupported()) {
       setStatus({
         kind: "error",
-        message: "이 브라우저에서는 지원되지 않습니다. 아래 키워드 검색을 이용해 보세요.",
+        message: "이 브라우저에서는 열 수 없습니다. 아래에서 키워드로 직접 찾아보세요.",
       });
       return;
     }
@@ -107,7 +107,7 @@ function VerseSuggest({ body, onPick, onFallback }: Props) {
       if (!alive.current) return;
       setStatus({
         kind: "error",
-        message: "준비에 실패했습니다. 네트워크를 확인하거나, 아래 키워드 검색을 이용해 보세요.",
+        message: "준비가 끊겼습니다. 네트워크를 확인해 다시 시도하거나, 아래에서 키워드로 직접 찾아보세요.",
       });
     }
   };
@@ -175,7 +175,7 @@ function VerseSuggest({ body, onPick, onFallback }: Props) {
           <p className="text-xs text-ink/50">
             {status.items.length > 0
               ? "이 하루에 닿는 말씀입니다. 마음에 닿는 구절을 담아보세요."
-              : "닿는 말씀을 찾지 못했습니다. 아래 키워드 검색을 이용해 보세요."}
+              : "닿는 말씀을 찾지 못했습니다. 아래에서 키워드로 직접 찾아보세요."}
           </p>
           <ul className="mt-2 divide-y divide-ink/8">
             {status.items.map((s) => (

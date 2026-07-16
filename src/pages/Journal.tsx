@@ -38,7 +38,7 @@ function Journal() {
             새기다
           </h1>
           <p className="mt-2 text-sm text-ink/55">
-            오늘 있었던 일과, 그 하루에 닿은 말씀의 기록.
+            오늘 있었던 일과, 그 하루에 닿은 말씀을 새깁니다.
           </p>
         </div>
         <a
@@ -52,10 +52,10 @@ function Journal() {
       {entries.length === 0 ? (
         <div className="mt-16 text-center">
           <p className="font-serif text-lg text-ink/60">
-            아직 새긴 기록이 없습니다.
+            아직 새겨진 하루가 없습니다.
           </p>
           <p className="mt-2 text-sm text-ink/45">
-            오늘 하루를 짧게라도 적어보세요. 기록이 쌓여 나의 신앙 연대기가
+            오늘 하루를 짧게라도 적어보세요. 새김이 쌓여 나의 신앙 연대기가
             됩니다.
           </p>
         </div>
@@ -98,8 +98,8 @@ function Journal() {
             </button>
           </div>
           <p className="mt-3 text-right text-[11px] text-ink/35">
-            기록은 이 브라우저에만 저장됩니다. 갈아타기 전에 내보내기를
-            이용하세요.
+            새김은 이 기기(브라우저)에만 머뭅니다. 기기를 옮기기 전에
+            내보내기로 챙겨 두세요.
           </p>
         </>
       )}
