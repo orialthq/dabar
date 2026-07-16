@@ -4,6 +4,7 @@ import { resolveVerse } from "../lib/journal";
 import {
   isSemanticSupported,
   isSemanticReady,
+  isSemanticCached,
   prepareSemantic,
   suggestVerses,
   type SemanticProgress,
@@ -77,7 +78,7 @@ function VerseSuggest({ body, onPick, onFallback }: Props) {
     }
   };
 
-  const start = () => {
+  const start = async () => {
     if (!isSemanticSupported()) {
       setStatus({
         kind: "error",
@@ -85,8 +86,8 @@ function VerseSuggest({ body, onPick, onFallback }: Props) {
       });
       return;
     }
-    // 준비된 상태면 바로 검색, 아니면 다운로드 동의부터
-    if (isSemanticReady()) void run();
+    // 준비됐거나 이미 캐시에 있으면 바로 검색, 처음 받을 때만 다운로드 동의
+    if (isSemanticReady() || (await isSemanticCached())) void run();
     else setStatus({ kind: "consent" });
   };
 
@@ -114,7 +115,7 @@ function VerseSuggest({ body, onPick, onFallback }: Props) {
   if (status.kind === "idle")
     return (
       <button
-        onClick={start}
+        onClick={() => void start()}
         disabled={!canSearch}
         className="text-sm text-dawn hover:brightness-110 disabled:opacity-40 disabled:hover:brightness-100"
         title={canSearch ? undefined : "기록을 조금 더 적으면 찾을 수 있어요"}

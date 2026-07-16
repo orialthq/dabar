@@ -107,37 +107,64 @@ export function isSemanticSupported(): boolean {
   return typeof WebAssembly !== "undefined";
 }
 
+// 임베딩 모델과 리비전 — 코퍼스(빌드 타임)와 반드시 동일해야 한다. scripts/embed-bible.mjs와 짝.
+const EMBED_MODEL = "Xenova/multilingual-e5-small";
+const EMBED_REVISION = "761b726dd34fb83930e26aab4e9ac3899aa1fa78";
+const EMBED_DTYPE = "q8";
+
+/** 모델 파일 다운로드의 일시적 네트워크 오류를 짧은 재시도로 흡수 */
+function retryFetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+  const attempt = async (left: number): Promise<Response> => {
+    try {
+      return await fetch(input, init);
+    } catch (e) {
+      if (left <= 0) throw e;
+      await new Promise((r) => setTimeout(r, 1500));
+      return attempt(left - 1);
+    }
+  };
+  return attempt(2);
+}
+
+/** 모델이 이미 브라우저 캐시에 있는지 — 있으면 다운로드 동의 없이 바로 사용 */
+export async function isSemanticCached(): Promise<boolean> {
+  try {
+    const { ModelRegistry } = await import("@huggingface/transformers");
+    return await ModelRegistry.is_pipeline_cached("feature-extraction", EMBED_MODEL, {
+      dtype: EMBED_DTYPE,
+      revision: EMBED_REVISION,
+    });
+  } catch {
+    return false;
+  }
+}
+
 /** 모델 로드 (최초 1회 다운로드 ~110MB, 이후 브라우저 캐시). WebGPU 실패 시 WASM 폴백. */
 function loadEmbedder(onProgress?: (p: SemanticProgress) => void): Promise<Embedder> {
   if (!embedderPromise) {
     embedderPromise = (async () => {
-      const { pipeline } = await import("@huggingface/transformers");
-      const totals = new Map<string, { loaded: number; total: number }>();
-      const progress = (info: { status: string; file?: string; loaded?: number; total?: number }) => {
-        if (info.status === "progress" && info.file && info.total) {
-          totals.set(info.file, { loaded: info.loaded ?? 0, total: info.total });
-          let loaded = 0;
-          let total = 0;
-          for (const t of totals.values()) {
-            loaded += t.loaded;
-            total += t.total;
-          }
-          onProgress?.({ kind: "model", loaded, total });
+      const { pipeline, env } = await import("@huggingface/transformers");
+      (env as { fetch?: typeof fetch }).fetch = retryFetch;
+      const progress = (info: { status: string; progress?: number; loaded?: number; total?: number }) => {
+        // v4의 전체 진행률 이벤트 하나로 통일 (파일별 수동 합산 제거)
+        if (info.status === "progress_total" && typeof info.progress === "number") {
+          onProgress?.({ kind: "model", loaded: info.progress, total: 100 });
         }
       };
       const hasWebGpu = "gpu" in navigator;
-      const model = "Xenova/multilingual-e5-small";
       try {
         if (!hasWebGpu) throw new Error("WebGPU 미지원");
-        return (await pipeline("feature-extraction", model, {
+        return (await pipeline("feature-extraction", EMBED_MODEL, {
           device: "webgpu",
-          dtype: "q8",
+          dtype: EMBED_DTYPE,
+          revision: EMBED_REVISION,
           progress_callback: progress,
         })) as unknown as Embedder;
       } catch {
-        return (await pipeline("feature-extraction", model, {
+        return (await pipeline("feature-extraction", EMBED_MODEL, {
           device: "wasm",
-          dtype: "q8",
+          dtype: EMBED_DTYPE,
+          revision: EMBED_REVISION,
           progress_callback: progress,
         })) as unknown as Embedder;
       }

@@ -9,6 +9,7 @@ import path from "node:path";
 import { f16encode, f16decode } from "./embed-bible.mjs";
 
 const MODEL = "Xenova/multilingual-e5-small";
+const REVISION = "761b726dd34fb83930e26aab4e9ac3899aa1fa78"; // embed-bible.mjs와 동일 고정
 const OUT = "public/embeddings/themes.json";
 
 const src = JSON.parse(await readFile(path.resolve("scripts/themes.json"), "utf8"));
@@ -39,7 +40,7 @@ src.themes.forEach((t, ti) => {
 });
 
 console.log(`주제 ${src.themes.length}개 · 앵커 ${anchorTexts.length}개 임베딩...`);
-const extractor = await pipeline("feature-extraction", MODEL, { dtype: "fp32" });
+const extractor = await pipeline("feature-extraction", MODEL, { dtype: "fp32", revision: REVISION });
 const out = await extractor(anchorTexts, { pooling: "mean", normalize: true });
 const dim = out.dims[out.dims.length - 1];
 
@@ -64,6 +65,7 @@ out.dispose?.();
 
 const payload = {
   model: MODEL,
+  revision: REVISION,
   dim,
   queryPrefix: "query: ",
   themes: src.themes.map((t) => ({ id: t.id, label: t.label, verses: t.verses })),

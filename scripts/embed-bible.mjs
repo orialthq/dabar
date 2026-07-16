@@ -13,6 +13,9 @@ import { readFile, writeFile, mkdir } from "node:fs/promises";
 import path from "node:path";
 
 const DEFAULT_MODEL = "Xenova/multilingual-e5-small";
+// 리비전 고정: 코퍼스와 쿼리 임베딩은 반드시 같은 가중치여야 한다.
+// 업스트림 모델이 갱신되면 검색 품질이 소리 없이 무너지므로 커밋을 못 박는다 (HF skills 권고).
+const DEFAULT_REVISION = "761b726dd34fb83930e26aab4e9ac3899aa1fa78";
 const BATCH = 32;
 const SHARDS = 4;
 
@@ -26,6 +29,7 @@ const onlyBook = opt("book", null);
 const variant = opt("variant", "verse"); // verse | context
 const outDir = opt("out", "public/embeddings");
 const MODEL = opt("model", DEFAULT_MODEL);
+const REVISION = opt("revision", MODEL === DEFAULT_MODEL ? DEFAULT_REVISION : "main");
 if (!["verse", "context"].includes(variant)) {
   console.error(`알 수 없는 variant: ${variant}`);
   process.exit(1);
@@ -120,8 +124,8 @@ async function main() {
   const total = verses.length;
   console.log(`대상: ${onlyBook ?? "66권 전체"} · ${total}절 · variant=${variant}`);
 
-  console.log(`모델 로드 중: ${MODEL}`);
-  const extractor = await pipeline("feature-extraction", MODEL, { dtype: "fp32" });
+  console.log(`모델 로드 중: ${MODEL}@${REVISION.slice(0, 7)}`);
+  const extractor = await pipeline("feature-extraction", MODEL, { dtype: "fp32", revision: REVISION });
 
   // 차원은 첫 배치 출력에서 결정 (모델마다 다름: e5-small 384, e5-base 768, bge-m3 1024)
   let DIM = 0;
@@ -185,6 +189,7 @@ async function main() {
 
   const meta = {
     model: MODEL,
+    revision: REVISION,
     dim: DIM,
     total,
     variant,

@@ -116,6 +116,16 @@ export function isWebllmLoaded(model: string): boolean {
   return mlcEnginePromise !== null && mlcEngineModel === model;
 }
 
+/** 모델이 이미 브라우저 캐시에 있는지 — 있으면 다운로드 동의 카드를 건너뛴다 */
+export async function isWebllmCached(model: string): Promise<boolean> {
+  try {
+    const { hasModelInCache } = await import("@mlc-ai/web-llm");
+    return await hasModelInCache(model);
+  } catch {
+    return false;
+  }
+}
+
 async function generateWebllm(
   s: EngineSettings,
   system: string,

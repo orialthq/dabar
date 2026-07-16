@@ -1,7 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import type { VerseRef } from "../types/journal";
 import type { ChatMessage } from "../lib/engine";
-import { loadEngineSettings, isWebGpuAvailable, isWebllmLoaded } from "../lib/engine";
+import {
+  loadEngineSettings,
+  isWebGpuAvailable,
+  isWebllmLoaded,
+  isWebllmCached,
+} from "../lib/engine";
 import { buildContext, ask } from "../lib/ask";
 import { prepareSemantic } from "../lib/semantic";
 import VerseQuote from "../components/VerseQuote";
@@ -23,11 +28,25 @@ type Gate =
 
 function Ask() {
   const settings = loadEngineSettings();
-  const needsConsent = settings.kind === "webllm" && !isWebllmLoaded(settings.webllmModel);
   const [gate, setGate] = useState<Gate>(() => {
     if (settings.kind === "webllm" && !isWebGpuAvailable()) return { kind: "unsupported" };
-    return needsConsent ? { kind: "consent" } : { kind: "ready" };
+    if (settings.kind === "webllm" && !isWebllmLoaded(settings.webllmModel))
+      return { kind: "checking" };
+    return { kind: "ready" };
   });
+
+  // 처음 받을 때만 동의 카드 — 캐시에 있으면 바로 사용
+  useEffect(() => {
+    if (gate.kind !== "checking") return;
+    let alive = true;
+    isWebllmCached(settings.webllmModel).then((cached) => {
+      if (alive) setGate(cached ? { kind: "ready" } : { kind: "consent" });
+    });
+    return () => {
+      alive = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const [turns, setTurns] = useState<Turn[]>([]);
   const [input, setInput] = useState("");
   const busy = turns.some((t) => t.pending);
