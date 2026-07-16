@@ -42,6 +42,30 @@ function createWindow() {
 
   void loadURL(win);
 
+  if (process.env.DABAR_SMOKE_NET === "1") {
+    win.webContents.on("did-finish-load", async () => {
+      try {
+        const r = await win.webContents.executeJavaScript(`
+          (async () => {
+            const url = 'https://huggingface.co/mlc-ai/Qwen3-4B-q4f16_1-MLC/resolve/main/mlc-chat-config.json';
+            const out = {};
+            try { const f = await fetch(url); out.fetch = f.status + ' type=' + f.type; }
+            catch (e) { out.fetch = 'FAIL ' + String(e); }
+            try { const c = await caches.open('nettest'); await c.add(url); out.cacheAdd = 'ok'; await caches.delete('nettest'); }
+            catch (e) { out.cacheAdd = 'FAIL ' + String(e); }
+            try { const f2 = await fetch('https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/v0_2_84/base/Qwen3-4B-q4f16_1_cs1k-webgpu.wasm', {method:'HEAD'}); out.wasm = f2.status; }
+            catch (e) { out.wasm = 'FAIL ' + String(e); }
+            return out;
+          })()
+        `);
+        console.log("NET_RESULT " + JSON.stringify(r));
+      } catch (e) {
+        console.error("NET_FAIL " + String(e));
+      }
+      app.exit(0);
+    });
+  }
+
   if (process.env.DABAR_SMOKE_UPDATE === "1") {
     win.webContents.on("did-finish-load", async () => {
       try {

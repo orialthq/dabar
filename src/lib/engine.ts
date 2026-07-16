@@ -87,11 +87,22 @@ function loadWebllm(model: string, onProgress?: (p: EngineProgress) => void): Pr
     mlcEngineModel = model;
     mlcEnginePromise = (async () => {
       const { CreateMLCEngine } = await import("@mlc-ai/web-llm");
-      const engine = await CreateMLCEngine(model, {
-        initProgressCallback: (r: { text: string; progress: number }) =>
-          onProgress?.({ text: r.text, progress: r.progress }),
-      });
-      return engine as unknown as MLCEngine;
+      try {
+        const engine = await CreateMLCEngine(model, {
+          initProgressCallback: (r: { text: string; progress: number }) =>
+            onProgress?.({ text: r.text, progress: r.progress }),
+        });
+        return engine as unknown as MLCEngine;
+      } catch (e) {
+        // 대용량 다운로드 중 일시적 네트워크 끊김 — 받은 조각은 캐시에 남아 재시도 시 이어받는다
+        const msg = e instanceof Error ? e.message : String(e);
+        if (/Cache\.add|network error|Failed to fetch/i.test(msg)) {
+          throw new Error(
+            "모델을 내려받다 네트워크가 잠시 끊겼습니다. 다시 시도하면 받은 부분에 이어서 계속합니다."
+          );
+        }
+        throw e;
+      }
     })();
     mlcEnginePromise.catch(() => {
       mlcEnginePromise = null;
