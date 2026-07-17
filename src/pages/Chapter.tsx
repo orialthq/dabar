@@ -4,6 +4,7 @@ import { loadBook, loadBooks } from "../lib/bible";
 import { navigate } from "../lib/router";
 import { loadDraft, saveDraft } from "../lib/journal";
 import { FONT_STEPS, loadFontStep, saveFontStep, saveLastRead } from "../lib/reader";
+import { shareVerseCard } from "../lib/card";
 
 interface Props {
   bookId: string;
@@ -180,6 +181,17 @@ function Chapter({ bookId, chapter, verse }: Props) {
                     className="text-ink/50 hover:text-ink"
                   >
                     {copied ? "복사했습니다" : "복사"}
+                  </button>
+                  <button
+                    onClick={() =>
+                      void shareVerseCard(
+                        verses[n - 1],
+                        `${meta.name} ${chapter}:${n}`
+                      ).catch(() => {})
+                    }
+                    className="text-ink/50 hover:text-ink"
+                  >
+                    카드로 저장
                   </button>
                 </div>
               )}

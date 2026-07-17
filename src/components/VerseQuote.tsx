@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { VerseRef } from "../types/journal";
 import { resolveVerse } from "../lib/journal";
+import { shareVerseCard } from "../lib/card";
 
 interface Props {
   refValue: VerseRef;
@@ -36,6 +37,17 @@ function VerseQuote({ refValue, onRemove }: Props) {
             >
               {resolved.label} (개역한글)
             </a>
+            <button
+              onClick={() =>
+                void shareVerseCard(
+                  resolved.text,
+                  resolved.label
+                ).catch(() => {})
+              }
+              className="text-xs text-ink/35 hover:text-ink/70"
+            >
+              카드
+            </button>
             {onRemove && (
               <button
                 onClick={onRemove}
