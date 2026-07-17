@@ -1,3 +1,6 @@
+import { useState } from "react";
+import { isDarkNow, setThemePref } from "../lib/theme";
+
 const LINKS = [
   { hash: "#/read", label: "읽다" },
   { hash: "#/search", label: "찾다" },
@@ -7,6 +10,25 @@ const LINKS = [
 
 interface Props {
   active: string; // "read" | "search" | ""
+}
+
+/** 밝게/어둡게 빠른 전환 — 세밀한 선택(시스템 따르기)은 설정에 */
+function ThemeToggle() {
+  const [dark, setDark] = useState(isDarkNow);
+  return (
+    <button
+      onClick={() => {
+        const next = !dark;
+        setThemePref(next ? "dark" : "light");
+        setDark(next);
+      }}
+      aria-label={dark ? "밝게 보기" : "어둡게 보기"}
+      title={dark ? "밝게 보기" : "어둡게 보기"}
+      className="ml-auto text-sm text-mist/70 hover:text-hanji transition-colors leading-none"
+    >
+      {dark ? "☀" : "☾"}
+    </button>
+  );
 }
 
 function Header({ active }: Props) {
@@ -43,10 +65,11 @@ function Header({ active }: Props) {
             {l.label}
           </a>
         ))}
+        <ThemeToggle />
         <a
           href="#/settings"
           aria-label="설정"
-          className={`ml-auto text-xs ${
+          className={`text-xs ${
             active === "settings" ? "text-dawn" : "text-mist/70 hover:text-hanji"
           } transition-colors`}
         >

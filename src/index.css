@@ -57,6 +57,24 @@ html {
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='p'><feTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/><feComponentTransfer><feFuncA type='linear' slope='0.05'/></feComponentTransfer></filter><rect width='240' height='240' filter='url(%23p)'/></svg>");
 }
 
+/* 다크 모드 — 어두운 한지: 밝은 표면(.paper) 안에서만 토큰을 반전한다.
+   헤더·랜딩 히어로 등 원래 어두운 면은 그대로 둔다. */
+.dark .paper {
+  --color-hanji: #141924;
+  --color-hanji-dim: #1c222e;
+  --color-ink: #eae3d3;
+  --color-ink-soft: #f5efe1;
+  background-color: var(--color-hanji);
+}
+.dark
+  .paper
+  :is(.bg-white\/30, .bg-white\/40, .bg-white\/50, .bg-white\/60, .bg-white\/70) {
+  background-color: rgb(255 255 255 / 0.06);
+}
+.dark .paper :is(.text-red-800\/80, .hover\:text-red-700:hover) {
+  color: #e89b90;
+}
+
 /* 계선(界線) — 고서의 이중 괘선 틀 (사주쌍변): 바깥 가는 선 + 안쪽 가는 선 */
 .gyeseon {
   border: 1px solid color-mix(in srgb, var(--color-ink) 30%, transparent);

@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import type { BookData, BookMeta } from "../types/bible";
 import { loadBook, loadBooks } from "../lib/bible";
 import { navigate } from "../lib/router";
+import { loadDraft, saveDraft } from "../lib/journal";
+import { FONT_STEPS, loadFontStep, saveFontStep, saveLastRead } from "../lib/reader";
 
 interface Props {
   bookId: string;
@@ -13,6 +15,9 @@ function Chapter({ bookId, chapter, verse }: Props) {
   const [books, setBooks] = useState<BookMeta[] | null>(null);
   const [book, setBook] = useState<BookData | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [fontStep, setFontStep] = useState(loadFontStep);
+  const [selected, setSelected] = useState<number | null>(null);
+  const [copied, setCopied] = useState(false);
   const highlightRef = useRef<HTMLLIElement | null>(null);
 
   useEffect(() => {
@@ -21,8 +26,15 @@ function Chapter({ bookId, chapter, verse }: Props) {
 
   useEffect(() => {
     setBook(null);
+    setSelected(null);
     loadBook(bookId).then(setBook).catch((e: Error) => setError(e.message));
   }, [bookId]);
+
+  // 읽던 자리 기억 (이어 읽기)
+  useEffect(() => {
+    saveLastRead({ bookId, chapter });
+    setSelected(null);
+  }, [bookId, chapter]);
 
   useEffect(() => {
     if (book && verse && highlightRef.current) {
@@ -40,6 +52,40 @@ function Chapter({ bookId, chapter, verse }: Props) {
   const verses = book.chapters[chapter - 1];
   if (!meta || !verses)
     return <p className="p-8 text-sm text-ink/70">본문을 찾을 수 없습니다.</p>;
+
+  const font = FONT_STEPS[fontStep];
+
+  const cycleFont = () => {
+    const n = (fontStep + 1) % FONT_STEPS.length;
+    setFontStep(n);
+    saveFontStep(n);
+  };
+
+  /** 이 절을 품고 새 새김 열기 — 쓰던 초안이 있으면 거기에 담는다 */
+  const keepVerse = (n: number) => {
+    const draft = loadDraft() ?? { title: "", body: "", verses: [] };
+    if (
+      !draft.verses.some(
+        (v) => v.bookId === bookId && v.chapter === chapter && v.verse === n
+      )
+    ) {
+      draft.verses = [...draft.verses, { bookId, chapter, verse: n }];
+    }
+    saveDraft(draft);
+    navigate("/write/new");
+  };
+
+  const copyVerse = async (n: number) => {
+    try {
+      await navigator.clipboard.writeText(
+        `${verses[n - 1]} (${meta.name} ${chapter}:${n}, 개역한글)`
+      );
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      /* 클립보드 미지원 — 조용히 무시 */
+    }
+  };
 
   const prev =
     chapter > 1
@@ -65,6 +111,14 @@ function Chapter({ bookId, chapter, verse }: Props) {
           ← 목차
         </a>
         <div className="flex items-center gap-2">
+          <button
+            onClick={cycleFont}
+            aria-label="글자 크기"
+            title={`글자 크기: ${font.label}`}
+            className="text-sm border border-ink/20 rounded px-2 py-1 text-ink/60 hover:border-dawn hover:text-dawn transition-colors"
+          >
+            가<span className="text-[10px] align-top">{fontStep + 1}</span>
+          </button>
           <select
             aria-label="장 이동"
             className="text-sm bg-transparent border border-ink/20 rounded px-2 py-1"
@@ -83,21 +137,52 @@ function Chapter({ bookId, chapter, verse }: Props) {
       <h1 className="mt-8 font-serif text-2xl md:text-3xl font-semibold text-center">
         {book.name} {chapter}장
       </h1>
+      <div
+        aria-hidden="true"
+        className="mt-4 mx-auto w-24 border-t-[3px] border-double border-ink/25"
+      />
 
       <ol className="mt-10 space-y-4">
         {verses.map((text, i) => {
           const n = i + 1;
           const hit = n === verse;
+          const isSel = n === selected;
           return (
             <li
               key={n}
               ref={hit ? highlightRef : undefined}
-              className={`flex gap-3 rounded-md ${hit ? "bg-dawn/15 -mx-3 px-3 py-2" : ""}`}
+              className={`rounded-md ${hit ? "bg-dawn/15 -mx-3 px-3 py-2" : ""} ${
+                isSel ? "bg-hanji-dim -mx-3 px-3 py-2" : ""
+              }`}
             >
-              <span className="shrink-0 w-6 text-right text-[11px] leading-7 text-dawn/80 select-none">
-                {n}
-              </span>
-              <p className="font-serif text-[17px] leading-7">{text}</p>
+              <button
+                onClick={() => setSelected(isSel ? null : n)}
+                className="flex gap-3 w-full text-left"
+                aria-label={`${n}절 선택`}
+              >
+                <span
+                  className={`shrink-0 w-6 text-right text-[11px] ${font.num} text-dawn/80 select-none`}
+                >
+                  {n}
+                </span>
+                <p className={`font-serif ${font.text}`}>{text}</p>
+              </button>
+              {isSel && (
+                <div className="mt-2 ml-9 flex items-center gap-4 text-sm">
+                  <button
+                    onClick={() => keepVerse(n)}
+                    className="text-dawn hover:brightness-110"
+                  >
+                    ✦ 새김에 담기
+                  </button>
+                  <button
+                    onClick={() => void copyVerse(n)}
+                    className="text-ink/50 hover:text-ink"
+                  >
+                    {copied ? "복사했습니다" : "복사"}
+                  </button>
+                </div>
+              )}
             </li>
           );
         })}

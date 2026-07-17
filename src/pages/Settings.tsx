@@ -1,6 +1,13 @@
 import { useState } from "react";
 import type { EngineKind, EngineSettings } from "../lib/engine";
 import { loadEngineSettings, saveEngineSettings, isWebGpuAvailable } from "../lib/engine";
+import { loadThemePref, setThemePref, type ThemePref } from "../lib/theme";
+
+const THEMES: { value: ThemePref; label: string }[] = [
+  { value: "system", label: "시스템 따르기" },
+  { value: "light", label: "밝게 (한지)" },
+  { value: "dark", label: "어둡게 (새벽)" },
+];
 
 const ENGINES: { kind: EngineKind; name: string; desc: string }[] = [
   {
@@ -26,6 +33,7 @@ const inputCls =
 function Settings() {
   const [s, setS] = useState<EngineSettings>(loadEngineSettings);
   const [saved, setSaved] = useState(false);
+  const [theme, setTheme] = useState<ThemePref>(loadThemePref);
 
   const update = (patch: Partial<EngineSettings>) => {
     setS((prev) => ({ ...prev, ...patch }));
@@ -40,6 +48,28 @@ function Settings() {
   return (
     <div className="max-w-2xl mx-auto px-6 py-10 md:py-14">
       <h1 className="font-serif text-xl font-semibold">설정</h1>
+
+      <h2 className="mt-6 text-sm font-medium">화면</h2>
+      <div className="mt-2 flex gap-2">
+        {THEMES.map((t) => (
+          <button
+            key={t.value}
+            onClick={() => {
+              setThemePref(t.value);
+              setTheme(t.value);
+            }}
+            className={`text-xs rounded-full px-4 py-1.5 border transition-colors ${
+              theme === t.value
+                ? "border-dawn bg-dawn/15 text-ink"
+                : "border-ink/15 text-ink/50 hover:border-ink/35"
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      <h2 className="mt-8 text-sm font-medium">묻다</h2>
       <p className="mt-1 text-xs text-ink/50">
         묻다의 응답을 어디에서 만들지 고릅니다. 말씀 찾기(새기다)는 언제나 기기 안에서 동작합니다.
       </p>

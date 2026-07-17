@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { BookMeta } from "../types/bible";
 import { loadBooks } from "../lib/bible";
+import { loadLastRead } from "../lib/reader";
 
 function Books() {
   const [books, setBooks] = useState<BookMeta[] | null>(null);
@@ -26,6 +27,19 @@ function Books() {
       <p className="mt-2 text-sm text-ink/55">
         성경전서 개역한글판 · 66권 1,189장 31,102절
       </p>
+      {(() => {
+        const last = loadLastRead();
+        const book = last && books.find((b) => b.id === last.bookId);
+        if (!last || !book) return null;
+        return (
+          <a
+            href={`#/read/${last.bookId}/${last.chapter}`}
+            className="mt-6 inline-flex items-center gap-2 border border-dawn/50 bg-dawn/10 rounded-full px-5 py-2 text-sm text-ink hover:brightness-105 transition"
+          >
+            이어 읽기 — {book.name} {last.chapter}장 →
+          </a>
+        );
+      })()}
       {sections.map((s) => (
         <section key={s.key} className="mt-10">
           <h2 className="text-xs tracking-widest text-ink/45 border-b border-ink/15 pb-2">
