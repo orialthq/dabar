@@ -8,6 +8,7 @@ import Editor from "./pages/Editor";
 import Ask from "./pages/Ask";
 import Settings from "./pages/Settings";
 import DesktopUpdate from "./components/DesktopUpdate";
+import MonthReview from "./pages/MonthReview";
 import { useHashRoute } from "./lib/router";
 
 function App() {
@@ -33,6 +34,9 @@ function App() {
     light = true;
   } else if (section === "settings") {
     page = <Settings />;
+    light = true;
+  } else if (section === "write" && route[1] === "month" && route[2]) {
+    page = <MonthReview ym={route[2]} />;
     light = true;
   } else if (section === "write" && route[1] === "new") {
     page = <Editor />;

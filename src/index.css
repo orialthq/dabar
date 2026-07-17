@@ -128,6 +128,33 @@ body {
   }
 }
 
+/* 새기기 — 낙관이 찍히는 순간 */
+.stamp-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--color-hanji) 55%, transparent);
+}
+.stamp {
+  animation: stamp 0.55s cubic-bezier(0.2, 1.4, 0.4, 1) forwards;
+}
+@keyframes stamp {
+  0% {
+    opacity: 0;
+    transform: scale(2.4) rotate(-11deg);
+  }
+  55% {
+    opacity: 1;
+    transform: scale(0.94) rotate(-3deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(-3deg);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .rise {

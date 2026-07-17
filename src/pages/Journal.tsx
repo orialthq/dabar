@@ -132,6 +132,29 @@ function Journal() {
         </div>
       )}
 
+      {(() => {
+        const months: string[] = [];
+        for (const e of entries) {
+          const d = new Date(e.createdAt);
+          const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+          if (!months.includes(ym)) months.push(ym);
+        }
+        if (months.length === 0) return null;
+        return (
+          <p className="mt-6 text-[11px] text-ink/40">
+            월간 돌아보기:{" "}
+            {months.slice(0, 6).map((ym, i) => (
+              <span key={ym}>
+                {i > 0 && " · "}
+                <a href={`#/write/month/${ym}`} className="hover:text-dawn">
+                  {parseInt(ym.slice(5), 10)}월
+                </a>
+              </span>
+            ))}
+          </p>
+        );
+      })()}
+
       {themes.length > 1 && (
         <div className="mt-6 flex flex-wrap gap-2">
           {themes.map((t) => (

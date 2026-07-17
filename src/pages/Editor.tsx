@@ -26,6 +26,7 @@ function Editor({ entryId }: Props) {
   const [draft, setDraft] = useState<Draft>(EMPTY);
   const [notFound, setNotFound] = useState(false);
   const [showPicker, setShowPicker] = useState(false);
+  const [stamping, setStamping] = useState(false);
   const loaded = useRef(false);
 
   useEffect(() => {
@@ -60,13 +61,19 @@ function Editor({ entryId }: Props) {
   const canSave = draft.body.trim().length > 0;
 
   const onSave = () => {
-    if (!canSave) return;
+    if (!canSave || stamping) return;
     saveEntry(
       { ...draft, title: draft.title.trim(), body: draft.body.trim() },
       entryId
     );
     if (isNew) clearDraft();
-    navigate("/write");
+    // 낙관이 찍히는 순간 — 모션 축소 선호 시 곧바로 이동
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      navigate("/write");
+      return;
+    }
+    setStamping(true);
+    setTimeout(() => navigate("/write"), 850);
   };
 
   const onDelete = () => {
@@ -193,6 +200,12 @@ function Editor({ entryId }: Props) {
       </div>
 
       {entryId && <SimilarEntries entryId={entryId} />}
+
+      {stamping && (
+        <div className="stamp-overlay" aria-hidden="true">
+          <span className="stamp seal w-24 h-24 text-4xl">דבר</span>
+        </div>
+      )}
     </div>
   );
 }
