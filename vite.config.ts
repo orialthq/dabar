@@ -4,7 +4,7 @@ import tailwindcss from "@tailwindcss/vite";
 import { VitePWA } from "vite-plugin-pwa";
 
 // GitHub Pages 프로젝트 페이지 기준 base.
-// 커스텀 도메인(dabar.orialt.dev) 연결 시 "/"로 변경하고 public/CNAME 추가.
+// 커스텀 도메인 연결 시(도메인 확보 후) "/"로 변경하고 public/CNAME 추가.
 export default defineConfig({
   base: "/dabar/",
   build: {

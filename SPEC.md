@@ -2,7 +2,7 @@
 
 > 오늘 있었던 일을 쓰면, 성경이 그 하루에 답하는 신앙 기록 서비스
 
-- 레포: `orialthq/dabar` · 배포: GitHub Pages (`orialthq.github.io/dabar` → 추후 `dabar.orialt.dev`)
+- 레포: `orialthq/dabar` · 배포: GitHub Pages (`orialthq.github.io/dabar`)
 - 상태: M1 (스캐폴드 + 배포 파이프라인)
 
 ## 1. 네이밍

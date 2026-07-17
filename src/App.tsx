@@ -64,7 +64,14 @@ function App() {
         <span>성경전서 개역한글판 (대한성서공회 역, 1961)</span>
         <span className="md:ml-auto flex items-center gap-4">
           <DesktopUpdate variant="footer" />
-          <span>dabar.orialt.dev</span>
+          <a
+            href="https://orialthq.github.io/dabar/"
+            target="_blank"
+            rel="noreferrer"
+            className="hover:text-dawn transition-colors"
+          >
+            orialthq.github.io/dabar
+          </a>
         </span>
       </footer>
     </div>
