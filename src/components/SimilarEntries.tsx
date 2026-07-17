@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import type { Entry } from "../types/journal";
 import { loadEntries } from "../lib/journal";
 import { canReflect, ensureVectors, similarEntries } from "../lib/reflect";
+import { ArrowRight, History } from "lucide-react";
 
 interface Props {
   entryId: string;
@@ -31,22 +32,28 @@ function SimilarEntries({ entryId }: Props) {
   if (similar.length === 0) return null;
 
   return (
-    <div className="mt-10 border-t-[4px] border-double border-ink/15 pt-5">
-      <p className="font-serif text-sm font-semibold text-ink/60">닮은 새김</p>
-      <ul className="mt-2 space-y-2">
+    <div className="mt-10 border-t border-ink/9 pt-6">
+      <p className="section-label">
+        <History size={15} strokeWidth={1.8} className="text-dawn" aria-hidden="true" />
+        닮은 새김
+      </p>
+      <ul className="mt-3 divide-y divide-ink/8">
         {similar.map((e) => (
           <li key={e.id}>
-            <a href={`#/write/${e.id}`} className="group block">
-              <span className="text-[11px] text-ink/40">
+            <a href={`#/write/${e.id}`} className="group flex items-center gap-3 py-3">
+              <span className="min-w-0 flex-1">
+                <span className="text-[11px] text-ink/40">
                 {new Date(e.createdAt).toLocaleDateString("ko-KR", {
                   year: "numeric",
                   month: "long",
                   day: "numeric",
                 })}
-              </span>
-              <p className="text-sm text-ink/70 group-hover:text-ink line-clamp-1">
+                </span>
+                <p className="text-sm text-ink/70 group-hover:text-ink line-clamp-1">
                 {e.title || e.body}
-              </p>
+                </p>
+              </span>
+              <ArrowRight size={14} className="text-ink/25 group-hover:text-dawn" aria-hidden="true" />
             </a>
           </li>
         ))}

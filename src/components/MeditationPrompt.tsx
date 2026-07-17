@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { VerseRef } from "../types/journal";
 import { loadEngineSettings, isWebGpuAvailable, isWebllmLoaded, type EngineProgress } from "../lib/engine";
 import { meditationQuestions } from "../lib/meditate";
+import { ArrowDownToLine, DownloadCloud, MessageCircleQuestion, RotateCcw } from "lucide-react";
 
 interface Props {
   body: string;
@@ -60,15 +61,19 @@ function MeditationPrompt({ body, verses, onAppend }: Props) {
 
   if (status.kind === "idle")
     return (
-      <button onClick={start} className="text-sm text-dawn hover:brightness-110">
-        ✦ 이 말씀으로 묵상 질문 받기
+      <button onClick={start} className="btn-ghost !text-dawn">
+        <MessageCircleQuestion size={15} strokeWidth={1.8} aria-hidden="true" />
+        이 말씀으로 묵상 질문 받기
       </button>
     );
 
   return (
-    <div className="border border-ink/15 rounded-lg p-4 bg-white/40">
+    <div className="surface p-4 md:p-5">
       {status.kind === "consent" && (
         <>
+          <span className="icon-tile mb-4">
+            <DownloadCloud size={19} strokeWidth={1.7} aria-hidden="true" />
+          </span>
           <p className="text-xs text-ink/50 leading-5">
             묵상 질문은 기기 안에서 동작하는 언어 모델을 사용합니다. 처음 한 번, 약 2.3GB를
             내려받습니다 (Wi-Fi 권장). 대화는 이 기기 밖으로 나가지 않습니다.
@@ -76,13 +81,13 @@ function MeditationPrompt({ body, verses, onAppend }: Props) {
           <div className="mt-3 flex items-center gap-3">
             <button
               onClick={() => void run()}
-              className="text-sm bg-ink text-hanji rounded px-4 py-1.5 hover:bg-ink-soft transition-colors"
+              className="btn-primary !min-h-9"
             >
               준비하고 받기
             </button>
             <button
               onClick={() => setStatus({ kind: "idle" })}
-              className="text-xs text-ink/40 hover:text-ink/70"
+              className="btn-ghost"
             >
               다음에
             </button>
@@ -108,23 +113,25 @@ function MeditationPrompt({ body, verses, onAppend }: Props) {
       {status.kind === "done" && (
         <>
           <p className="text-xs text-ink/50">말씀 곁에 머무르며, 하나를 골라 이어 적어보세요.</p>
-          <ul className="mt-2 space-y-2">
+          <ul className="mt-3 space-y-1">
             {status.questions.map((q) => (
               <li key={q}>
                 <button
                   onClick={() => onAppend(q)}
-                  className="w-full text-left text-sm leading-6 text-ink/75 hover:text-ink group"
+                  className="group flex w-full items-start gap-2 rounded-lg px-2 py-2 text-left text-sm leading-6 text-ink/75 hover:bg-dawn/6 hover:text-ink"
                   title="기록에 덧붙이기"
                 >
-                  {q} <span className="text-[11px] text-dawn opacity-0 group-hover:opacity-100">← 담기</span>
+                  <span className="flex-1">{q}</span>
+                  <ArrowDownToLine size={14} strokeWidth={1.8} className="mt-1 shrink-0 text-dawn opacity-50 group-hover:opacity-100" aria-hidden="true" />
                 </button>
               </li>
             ))}
           </ul>
           <button
             onClick={() => void run()}
-            className="mt-2 text-xs text-ink/40 hover:text-ink/70"
+            className="btn-ghost mt-2"
           >
+            <RotateCcw size={13} strokeWidth={1.8} aria-hidden="true" />
             다시 받기
           </button>
         </>

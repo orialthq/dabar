@@ -10,6 +10,7 @@ import Settings from "./pages/Settings";
 import DesktopUpdate from "./components/DesktopUpdate";
 import MonthReview from "./pages/MonthReview";
 import { useHashRoute } from "./lib/router";
+import { ExternalLink } from "lucide-react";
 
 function App() {
   const route = useHashRoute();
@@ -52,31 +53,34 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="app-shell">
       <Header active={section} />
       <main className={`flex-1 flex flex-col ${light ? "paper text-ink" : ""}`}>
         {page}
       </main>
       <footer
-        className={`px-6 md:px-12 py-8 text-xs flex flex-col md:flex-row gap-2 md:gap-6 md:items-center ${
+        className={`px-4 py-7 text-xs ${
           light
-            ? "paper text-ink/40 border-t-[4px] border-double border-ink/15"
-            : "text-mist"
+            ? "paper text-ink/40 border-t border-ink/10"
+            : "text-mist border-t border-hanji/8"
         }`}
       >
-        <span>© 2026 OriAlt</span>
-        <span>성경전서 개역한글판 (대한성서공회 역, 1961)</span>
-        <span className="md:ml-auto flex items-center gap-4">
-          <DesktopUpdate variant="footer" />
-          <a
-            href="https://orialthq.github.io/dabar/"
-            target="_blank"
-            rel="noreferrer"
-            className="hover:text-dawn transition-colors"
-          >
-            orialthq.github.io/dabar
-          </a>
-        </span>
+        <div className="mx-auto flex w-full max-w-[70rem] flex-col gap-3 md:flex-row md:items-center md:gap-6">
+          <span>© 2026 OriAlt</span>
+          <span>성경전서 개역한글판 · 대한성서공회 역, 1961</span>
+          <span className="flex items-center gap-4 md:ml-auto">
+            <DesktopUpdate variant="footer" />
+            <a
+              href="https://orialthq.github.io/dabar/"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 hover:text-dawn transition-colors"
+            >
+              웹에서 열기
+              <ExternalLink size={12} strokeWidth={1.8} aria-hidden="true" />
+            </a>
+          </span>
+        </div>
       </footer>
     </div>
   );

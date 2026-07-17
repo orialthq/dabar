@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import type { VerseRef } from "../types/journal";
 import { resolveVerse } from "../lib/journal";
 import { shareVerseCard } from "../lib/card";
+import { ImageDown, Quote, X } from "lucide-react";
 
 interface Props {
   refValue: VerseRef;
@@ -24,16 +25,17 @@ function VerseQuote({ refValue, onRemove }: Props) {
   }, [refValue]);
 
   return (
-    <blockquote className="border-l-[6px] border-double border-dawn/60 pl-4 py-1">
+    <blockquote className="verse-quote">
       {resolved ? (
         <>
-          <p className="font-serif text-[15px] leading-6 text-ink/85">
-            {resolved.text}
-          </p>
+          <div className="flex gap-3">
+            <Quote size={16} strokeWidth={1.6} className="mt-1 shrink-0 text-dawn/65" aria-hidden="true" />
+            <p className="font-serif text-[15px] leading-7 text-ink/85">{resolved.text}</p>
+          </div>
           <footer className="mt-1 flex items-center gap-3">
             <a
               href={`#/read/${refValue.bookId}/${refValue.chapter}/${refValue.verse}`}
-              className="text-xs text-dawn"
+              className="ml-7 text-xs font-medium text-dawn"
             >
               {resolved.label} (개역한글)
             </a>
@@ -44,15 +46,17 @@ function VerseQuote({ refValue, onRemove }: Props) {
                   resolved.label
                 ).catch(() => {})
               }
-              className="text-xs text-ink/35 hover:text-ink/70"
+              className="btn-ghost !min-h-7 !px-1.5 !text-[11px]"
             >
-              카드
+              <ImageDown size={12} strokeWidth={1.8} aria-hidden="true" />
+              카드로 저장
             </button>
             {onRemove && (
               <button
                 onClick={onRemove}
-                className="text-xs text-ink/35 hover:text-ink/70"
+                className="btn-ghost !min-h-7 !px-1.5 !text-[11px]"
               >
+                <X size={12} strokeWidth={1.8} aria-hidden="true" />
                 빼기
               </button>
             )}

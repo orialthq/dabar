@@ -8,6 +8,17 @@ import {
   downloadText,
 } from "../lib/journal";
 import { anniversaries, canReflect, ensureVectors, themeOf } from "../lib/reflect";
+import {
+  ArrowRight,
+  BookOpenText,
+  CalendarDays,
+  DatabaseBackup,
+  Download,
+  Feather,
+  History,
+  Plus,
+  Upload,
+} from "lucide-react";
 
 function fmtDate(iso: string): string {
   return new Date(iso).toLocaleDateString("ko-KR", {
@@ -96,35 +107,44 @@ function Journal() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto px-6 py-10 md:py-14">
-      <div className="flex items-center justify-between gap-4">
+    <div className="page-shell">
+      <div className="flex items-end justify-between gap-4">
         <div>
-          <h1 className="font-serif text-2xl md:text-3xl font-semibold">
-            새기다
-          </h1>
-          <p className="mt-2 text-sm text-ink/55">
+          <p className="page-kicker">
+            <Feather size={14} strokeWidth={1.8} aria-hidden="true" />
+            JOURNAL
+          </p>
+          <h1 className="page-title">새기다</h1>
+          <p className="page-lead">
             오늘 있었던 일과, 그 하루에 닿은 말씀을 새깁니다.
           </p>
         </div>
         <a
           href="#/write/new"
-          className="shrink-0 bg-dawn text-ink text-sm font-medium rounded-full px-5 py-2 hover:brightness-110 transition"
+          className="btn-primary shrink-0"
         >
+          <Plus size={16} strokeWidth={2} aria-hidden="true" />
           새로 새기기
         </a>
       </div>
 
       {remembered.length > 0 && (
-        <div className="mt-8 gyeseon rounded-sm px-5 py-4">
-          <p className="font-serif text-sm font-semibold text-ink/70">돌아보기</p>
-          <ul className="mt-2 space-y-2">
+        <div className="surface mt-8 overflow-hidden">
+          <div className="flex items-center gap-2 border-b border-ink/9 bg-dawn/6 px-5 py-3.5">
+            <History size={16} strokeWidth={1.8} className="text-dawn" aria-hidden="true" />
+            <p className="font-serif text-sm font-semibold text-ink/70">돌아보기</p>
+          </div>
+          <ul className="divide-y divide-ink/8 px-5">
             {remembered.map(({ entry, label }) => (
               <li key={entry.id}>
-                <a href={`#/write/${entry.id}`} className="group block">
+                <a href={`#/write/${entry.id}`} className="group flex items-center gap-3 py-3.5">
+                  <span className="min-w-0 flex-1">
                   <span className="text-[11px] text-dawn">{label}</span>
                   <p className="text-sm text-ink/70 group-hover:text-ink line-clamp-1">
                     {entry.title || entry.body}
                   </p>
+                  </span>
+                  <ArrowRight size={15} className="text-ink/25 transition group-hover:translate-x-0.5 group-hover:text-dawn" aria-hidden="true" />
                 </a>
               </li>
             ))}
@@ -141,17 +161,17 @@ function Journal() {
         }
         if (months.length === 0) return null;
         return (
-          <p className="mt-6 text-[11px] text-ink/40">
-            월간 돌아보기:{" "}
-            {months.slice(0, 6).map((ym, i) => (
-              <span key={ym}>
-                {i > 0 && " · "}
-                <a href={`#/write/month/${ym}`} className="hover:text-dawn">
+          <div className="mt-6 flex flex-wrap items-center gap-2">
+            <span className="mr-1 inline-flex items-center gap-1.5 text-[11px] font-medium text-ink/45">
+              <CalendarDays size={14} strokeWidth={1.8} aria-hidden="true" />
+              월간 돌아보기
+            </span>
+            {months.slice(0, 6).map((ym) => (
+                <a key={ym} href={`#/write/month/${ym}`} className="tag hover:border-dawn/50 hover:text-dawn">
                   {parseInt(ym.slice(5), 10)}월
                 </a>
-              </span>
             ))}
-          </p>
+          </div>
         );
       })()}
 
@@ -161,11 +181,8 @@ function Journal() {
             <button
               key={t.id}
               onClick={() => setThemeFilter(themeFilter === t.id ? null : t.id)}
-              className={`text-[11px] rounded-full px-3 py-1 border transition-colors ${
-                themeFilter === t.id
-                  ? "border-dawn bg-dawn/15 text-ink"
-                  : "border-ink/15 text-ink/50 hover:border-ink/35"
-              }`}
+              className="tag"
+              data-active={themeFilter === t.id}
             >
               {t.label} {t.count}
             </button>
@@ -174,7 +191,10 @@ function Journal() {
       )}
 
       {entries.length === 0 ? (
-        <div className="mt-16 text-center">
+        <div className="empty-state mt-10">
+          <span className="icon-tile mx-auto mb-4">
+            <Feather size={20} strokeWidth={1.7} aria-hidden="true" />
+          </span>
           <p className="font-serif text-lg text-ink/60">
             아직 새겨진 하루가 없습니다.
           </p>
@@ -185,14 +205,14 @@ function Journal() {
         </div>
       ) : (
         <>
-          <ol className="mt-8 space-y-4">
+          <ol className="mt-8 space-y-3">
             {visible.map((e) => {
               const theme = themeOf(e.id);
               return (
                 <li key={e.id}>
                   <a
                     href={`#/write/${e.id}`}
-                    className="block border border-ink/12 rounded-lg p-5 bg-white/40 hover:border-dawn/60 transition-colors"
+                    className="action-card group block p-5 md:p-6"
                   >
                     <div className="flex items-baseline justify-between gap-4">
                       <span className="text-xs text-ink/45">
@@ -204,7 +224,8 @@ function Journal() {
                         )}
                       </span>
                       {e.verses.length > 0 && (
-                        <span className="text-[11px] text-dawn">
+                        <span className="inline-flex items-center gap-1 text-[11px] text-dawn">
+                          <BookOpenText size={12} strokeWidth={1.8} aria-hidden="true" />
                           말씀 {e.verses.length}
                         </span>
                       )}
@@ -215,6 +236,10 @@ function Journal() {
                     <p className="mt-1 text-sm leading-6 text-ink/70 line-clamp-3 whitespace-pre-line">
                       {e.body}
                     </p>
+                    <span className="mt-4 inline-flex items-center gap-1 text-[11px] font-medium text-ink/35 transition group-hover:text-dawn">
+                      펼쳐 보기
+                      <ArrowRight size={13} strokeWidth={1.8} aria-hidden="true" />
+                    </span>
                   </a>
                 </li>
               );
@@ -223,28 +248,31 @@ function Journal() {
         </>
       )}
 
-      <div className="mt-10 flex flex-wrap justify-end gap-2">
+      <div className="mt-10 flex flex-wrap justify-end gap-2 border-t border-ink/9 pt-6">
         {entries.length > 0 && (
           <>
             <button
               onClick={() => void onExport()}
               disabled={exporting}
-              className="text-xs text-ink/50 hover:text-ink border border-ink/20 rounded px-3 py-1.5 disabled:opacity-50"
+              className="btn-secondary !min-h-9 !px-3 !text-xs"
             >
+              <Download size={14} strokeWidth={1.8} aria-hidden="true" />
               {exporting ? "내보내는 중…" : "마크다운으로 내보내기"}
             </button>
             <button
               onClick={onBackup}
-              className="text-xs text-ink/50 hover:text-ink border border-ink/20 rounded px-3 py-1.5"
+              className="btn-secondary !min-h-9 !px-3 !text-xs"
             >
+              <DatabaseBackup size={14} strokeWidth={1.8} aria-hidden="true" />
               백업 (JSON)
             </button>
           </>
         )}
         <button
           onClick={() => fileRef.current?.click()}
-          className="text-xs text-ink/50 hover:text-ink border border-ink/20 rounded px-3 py-1.5"
+          className="btn-secondary !min-h-9 !px-3 !text-xs"
         >
+          <Upload size={14} strokeWidth={1.8} aria-hidden="true" />
           백업 가져오기
         </button>
         <input

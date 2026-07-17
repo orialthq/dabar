@@ -5,6 +5,16 @@ import { navigate } from "../lib/router";
 import { loadDraft, saveDraft } from "../lib/journal";
 import { FONT_STEPS, loadFontStep, saveFontStep, saveLastRead } from "../lib/reader";
 import { shareVerseCard } from "../lib/card";
+import {
+  ArrowLeft,
+  ChevronLeft,
+  ChevronRight,
+  Copy,
+  Feather,
+  ImageDown,
+  List,
+  Type,
+} from "lucide-react";
 
 interface Props {
   bookId: string;
@@ -44,15 +54,15 @@ function Chapter({ bookId, chapter, verse }: Props) {
   }, [book, verse]);
 
   if (error)
-    return <p className="p-8 text-sm text-ink/70">{error} 새로고침해 주세요.</p>;
+    return <p className="page-shell text-sm text-ink/70">{error} 새로고침해 주세요.</p>;
   if (!book || !books)
-    return <p className="p-8 text-sm text-ink/50">말씀을 펴는 중…</p>;
+    return <p className="page-shell text-sm text-ink/50">말씀을 펴는 중…</p>;
 
   const meta = books.find((b) => b.id === bookId);
   const idx = books.findIndex((b) => b.id === bookId);
   const verses = book.chapters[chapter - 1];
   if (!meta || !verses)
-    return <p className="p-8 text-sm text-ink/70">본문을 찾을 수 없습니다.</p>;
+    return <p className="page-shell text-sm text-ink/70">본문을 찾을 수 없습니다.</p>;
 
   const font = FONT_STEPS[fontStep];
 
@@ -106,23 +116,25 @@ function Chapter({ bookId, chapter, verse }: Props) {
         : null;
 
   return (
-    <div className="max-w-2xl mx-auto px-6 py-10 md:py-14">
-      <div className="flex items-center justify-between gap-4">
-        <a href="#/read" className="text-xs text-ink/45 hover:text-dawn">
-          ← 목차
+    <div className="page-shell !pt-5 md:!pt-8">
+      <div className="reader-toolbar">
+        <a href="#/read" className="btn-ghost" aria-label="성경 목차">
+          <List size={16} strokeWidth={1.8} aria-hidden="true" />
+          <span className="hidden sm:inline">목차</span>
         </a>
         <div className="flex items-center gap-2">
           <button
             onClick={cycleFont}
             aria-label="글자 크기"
             title={`글자 크기: ${font.label}`}
-            className="text-sm border border-ink/20 rounded px-2 py-1 text-ink/60 hover:border-dawn hover:text-dawn transition-colors"
+            className="icon-btn !h-9 !w-9"
           >
-            가<span className="text-[10px] align-top">{fontStep + 1}</span>
+            <Type size={16} strokeWidth={1.8} aria-hidden="true" />
+            <span className="sr-only">{font.label}</span>
           </button>
           <select
             aria-label="장 이동"
-            className="text-sm bg-transparent border border-ink/20 rounded px-2 py-1"
+            className="select-field !min-h-9 !w-auto !rounded-xl !px-3 !py-1 text-xs"
             value={chapter}
             onChange={(e) => navigate(`/read/${bookId}/${e.target.value}`)}
           >
@@ -135,15 +147,16 @@ function Chapter({ bookId, chapter, verse }: Props) {
         </div>
       </div>
 
-      <h1 className="mt-8 font-serif text-2xl md:text-3xl font-semibold text-center">
+      <p className="mt-10 text-center text-[10px] font-semibold tracking-[0.14em] text-dawn">개역한글</p>
+      <h1 className="mt-2 font-serif text-2xl md:text-3xl font-semibold text-center tracking-[-0.03em]">
         {book.name} {chapter}장
       </h1>
       <div
         aria-hidden="true"
-        className="mt-4 mx-auto w-24 border-t-[3px] border-double border-ink/25"
+        className="mt-5 mx-auto h-px w-20 bg-gradient-to-r from-transparent via-ink/25 to-transparent"
       />
 
-      <ol className="mt-10 space-y-4">
+      <ol className="mt-10 space-y-2">
         {verses.map((text, i) => {
           const n = i + 1;
           const hit = n === verse;
@@ -152,13 +165,13 @@ function Chapter({ bookId, chapter, verse }: Props) {
             <li
               key={n}
               ref={hit ? highlightRef : undefined}
-              className={`rounded-md ${hit ? "bg-dawn/15 -mx-3 px-3 py-2" : ""} ${
-                isSel ? "bg-hanji-dim -mx-3 px-3 py-2" : ""
+              className={`rounded-xl transition-colors ${hit ? "bg-dawn/12 -mx-3 px-3 py-2" : ""} ${
+                isSel ? "bg-ink/[0.045] -mx-3 px-3 py-2" : ""
               }`}
             >
               <button
                 onClick={() => setSelected(isSel ? null : n)}
-                className="flex gap-3 w-full text-left"
+                className="flex gap-3 w-full rounded-lg py-2 text-left"
                 aria-label={`${n}절 선택`}
               >
                 <span
@@ -169,17 +182,19 @@ function Chapter({ bookId, chapter, verse }: Props) {
                 <p className={`font-serif ${font.text}`}>{text}</p>
               </button>
               {isSel && (
-                <div className="mt-2 ml-9 flex items-center gap-4 text-sm">
+                <div className="reader-actions">
                   <button
                     onClick={() => keepVerse(n)}
-                    className="text-dawn hover:brightness-110"
+                    className="btn-ghost !text-dawn"
                   >
-                    ✦ 새김에 담기
+                    <Feather size={14} strokeWidth={1.8} aria-hidden="true" />
+                    새김에 담기
                   </button>
                   <button
                     onClick={() => void copyVerse(n)}
-                    className="text-ink/50 hover:text-ink"
+                    className="btn-ghost"
                   >
+                    <Copy size={14} strokeWidth={1.8} aria-hidden="true" />
                     {copied ? "복사했습니다" : "복사"}
                   </button>
                   <button
@@ -189,8 +204,9 @@ function Chapter({ bookId, chapter, verse }: Props) {
                         `${meta.name} ${chapter}:${n}`
                       ).catch(() => {})
                     }
-                    className="text-ink/50 hover:text-ink"
+                    className="btn-ghost"
                   >
+                    <ImageDown size={14} strokeWidth={1.8} aria-hidden="true" />
                     카드로 저장
                   </button>
                 </div>
@@ -200,24 +216,30 @@ function Chapter({ bookId, chapter, verse }: Props) {
         })}
       </ol>
 
-      <nav className="mt-14 flex items-center justify-between text-sm">
+      <nav className="mt-14 flex items-center justify-between gap-3">
         {prev ? (
-          <a href={`#/read/${prev.id}/${prev.ch}`} className="text-ink/60 hover:text-dawn">
-            ← {prev.label}
+          <a href={`#/read/${prev.id}/${prev.ch}`} className="btn-secondary !justify-start">
+            <ChevronLeft size={15} strokeWidth={1.8} aria-hidden="true" />
+            {prev.label}
           </a>
         ) : (
           <span />
         )}
         {next ? (
-          <a href={`#/read/${next.id}/${next.ch}`} className="text-ink/60 hover:text-dawn">
-            {next.label} →
+          <a href={`#/read/${next.id}/${next.ch}`} className="btn-secondary !justify-end">
+            {next.label}
+            <ChevronRight size={15} strokeWidth={1.8} aria-hidden="true" />
           </a>
         ) : (
           <span />
         )}
       </nav>
 
-      <p className="mt-12 text-center text-[11px] text-ink/35">
+      <a href="#/read" className="mx-auto mt-10 flex w-fit items-center gap-1.5 text-[11px] text-ink/38 hover:text-dawn">
+        <ArrowLeft size={13} strokeWidth={1.8} aria-hidden="true" />
+        다른 책 펼치기
+      </a>
+      <p className="mt-4 text-center text-[11px] text-ink/30">
         성경전서 개역한글판 (대한성서공회 역, 1961)
       </p>
     </div>

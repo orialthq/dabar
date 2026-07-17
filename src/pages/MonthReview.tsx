@@ -3,6 +3,7 @@ import type { Entry, VerseRef } from "../types/journal";
 import { loadEntries, exportMarkdown, downloadText } from "../lib/journal";
 import { themeOf } from "../lib/reflect";
 import VerseQuote from "../components/VerseQuote";
+import { ArrowLeft, CalendarDays, Download, Feather } from "lucide-react";
 
 interface Props {
   ym: string; // "2026-07"
@@ -57,18 +58,22 @@ function MonthReview({ ym }: Props) {
   };
 
   return (
-    <div className="max-w-2xl mx-auto px-6 py-10 md:py-14">
-      <a href="#/write" className="text-xs text-ink/45 hover:text-dawn">
-        ← 새김 목록
+    <div className="page-shell">
+      <a href="#/write" className="btn-ghost">
+        <ArrowLeft size={15} strokeWidth={1.8} aria-hidden="true" />
+        새김 목록
       </a>
 
-      <div className="mt-6 gyeseon rounded-sm px-6 py-8 md:px-10 md:py-10">
-        <h1 className="font-serif text-2xl font-semibold text-center">
+      <div className="gyeseon mt-5 rounded-[1.25rem] px-6 py-8 md:px-10 md:py-10">
+        <span className="icon-tile mx-auto">
+          <CalendarDays size={19} strokeWidth={1.7} aria-hidden="true" />
+        </span>
+        <h1 className="mt-4 font-serif text-2xl font-semibold text-center tracking-[-0.03em]">
           {monthLabel(ym)}의 새김
         </h1>
         <div
           aria-hidden="true"
-          className="mt-4 mx-auto w-24 border-t-[3px] border-double border-ink/25"
+          className="mt-5 mx-auto h-px w-20 bg-gradient-to-r from-transparent via-ink/25 to-transparent"
         />
         <p className="mt-4 text-center text-sm text-ink/55">
           {entries.length}편의 새김 · {verses.length}곳의 말씀
@@ -82,12 +87,12 @@ function MonthReview({ ym }: Props) {
           </p>
         ) : (
           <>
-            <ol className="mt-8 space-y-3">
+            <ol className="mt-8 divide-y divide-ink/8 border-y border-ink/8">
               {[...entries].reverse().map((e) => {
                 const theme = themeOf(e.id);
                 return (
                   <li key={e.id}>
-                    <a href={`#/write/${e.id}`} className="group block">
+                    <a href={`#/write/${e.id}`} className="group block py-3.5">
                       <span className="text-[11px] text-ink/40">
                         {new Date(e.createdAt).toLocaleDateString("ko-KR", {
                           month: "long",
@@ -107,7 +112,8 @@ function MonthReview({ ym }: Props) {
 
             {verses.length > 0 && (
               <>
-                <h2 className="mt-10 font-serif text-sm font-semibold text-ink/60">
+                <h2 className="section-label mt-10">
+                  <Feather size={15} strokeWidth={1.8} className="text-dawn" aria-hidden="true" />
                   이 달에 닿은 말씀
                 </h2>
                 <div className="mt-3 space-y-4">
@@ -121,8 +127,9 @@ function MonthReview({ ym }: Props) {
             <div className="mt-10 text-center">
               <button
                 onClick={() => void onExport()}
-                className="text-xs text-ink/50 hover:text-ink border border-ink/20 rounded px-3 py-1.5"
+                className="btn-secondary !min-h-9 !text-xs"
               >
+                <Download size={14} strokeWidth={1.8} aria-hidden="true" />
                 이 달을 마크다운으로 내보내기
               </button>
             </div>

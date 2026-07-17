@@ -14,6 +14,7 @@ import VersePicker from "../components/VersePicker";
 import VerseSuggest from "../components/VerseSuggest";
 import MeditationPrompt from "../components/MeditationPrompt";
 import SimilarEntries from "../components/SimilarEntries";
+import { ArrowLeft, Feather, Link2, Save, Trash2 } from "lucide-react";
 
 interface Props {
   entryId?: string; // 없으면 새 새김
@@ -54,7 +55,7 @@ function Editor({ entryId }: Props) {
   if (notFound)
     return (
       <p className="p-8 text-sm text-ink/70">
-        기록을 찾을 수 없습니다. <a href="#/write" className="text-dawn">목록으로</a>
+        기록을 찾을 수 없습니다. <a href="#/write" className="text-dawn">새김 목록으로</a>
       </p>
     );
 
@@ -96,40 +97,53 @@ function Editor({ entryId }: Props) {
   };
 
   return (
-    <div className="max-w-2xl mx-auto px-6 py-10 md:py-14">
+    <div className="page-shell">
       <div className="flex items-center justify-between">
-        <a href="#/write" className="text-xs text-ink/45 hover:text-dawn">
-          ← 새김 목록
+        <a href="#/write" className="btn-ghost">
+          <ArrowLeft size={15} strokeWidth={1.8} aria-hidden="true" />
+          새김 목록
         </a>
         {!isNew && (
           <button
             onClick={onDelete}
-            className="text-xs text-ink/40 hover:text-red-700"
+            className="btn-ghost hover:!text-red-700"
           >
+            <Trash2 size={14} strokeWidth={1.8} aria-hidden="true" />
             지우기
           </button>
         )}
       </div>
 
-      <input
-        type="text"
-        value={draft.title}
-        onChange={(e) => setDraft((d) => ({ ...d, title: e.target.value }))}
-        placeholder="제목 (선택)"
-        aria-label="제목"
-        className="mt-8 w-full bg-transparent font-serif text-xl font-semibold placeholder:text-ink/25 focus:outline-none"
-      />
-      <textarea
-        value={draft.body}
-        onChange={(e) => setDraft((d) => ({ ...d, body: e.target.value }))}
-        placeholder="오늘 있었던 일을 적어보세요. 있는 그대로, 짧아도 좋습니다."
-        aria-label="본문"
-        rows={10}
-        className="mt-4 w-full bg-transparent text-[15px] leading-7 placeholder:text-ink/25 focus:outline-none resize-y"
-      />
+      <div className="editor-sheet">
+        <p className="flex items-center gap-2 text-[10px] font-semibold tracking-[0.12em] text-dawn">
+          <Feather size={13} strokeWidth={1.8} aria-hidden="true" />
+          {isNew ? "새로운 새김" : "새김 고치기"}
+        </p>
+        <input
+          type="text"
+          value={draft.title}
+          onChange={(e) => setDraft((d) => ({ ...d, title: e.target.value }))}
+          placeholder="제목 (선택)"
+          aria-label="제목"
+          className="mt-6 w-full bg-transparent font-serif text-2xl font-semibold tracking-[-0.03em] placeholder:text-ink/22 focus:outline-none"
+        />
+        <div className="section-divider mt-5" />
+        <textarea
+          value={draft.body}
+          onChange={(e) => setDraft((d) => ({ ...d, body: e.target.value }))}
+          placeholder="오늘 있었던 일을 적어보세요. 있는 그대로, 짧아도 좋습니다."
+          aria-label="본문"
+          rows={11}
+          className="mt-5 w-full resize-y bg-transparent text-[15px] leading-8 placeholder:text-ink/25 focus:outline-none"
+        />
+      </div>
 
       {draft.verses.length > 0 && (
-        <div className="mt-6 space-y-4">
+        <div className="mt-7 space-y-4">
+          <p className="section-label">
+            <Link2 size={15} strokeWidth={1.8} className="text-dawn" aria-hidden="true" />
+            이 새김에 담긴 말씀
+          </p>
           {draft.verses.map((v, i) => (
             <VerseQuote
               key={`${v.bookId}-${v.chapter}-${v.verse}`}
@@ -145,7 +159,7 @@ function Editor({ entryId }: Props) {
         </div>
       )}
 
-      <div className="mt-8 space-y-3">
+      <div className="mt-8 space-y-3 border-t border-ink/9 pt-6">
         <div>
           <VerseSuggest
             body={draft.body}
@@ -164,9 +178,10 @@ function Editor({ entryId }: Props) {
           ) : (
             <button
               onClick={() => setShowPicker(true)}
-              className="text-sm text-dawn hover:brightness-110"
+              className="btn-ghost !text-dawn"
             >
-              + 말씀 붙이기
+              <Link2 size={14} strokeWidth={1.8} aria-hidden="true" />
+              말씀 붙이기
             </button>
           )}
         </div>
@@ -184,12 +199,13 @@ function Editor({ entryId }: Props) {
         </div>
       </div>
 
-      <div className="mt-12 flex items-center gap-3">
+      <div className="mt-10 flex flex-wrap items-center gap-3">
         <button
           onClick={onSave}
           disabled={!canSave}
-          className="bg-ink text-hanji text-sm rounded-full px-6 py-2.5 hover:bg-ink-soft transition-colors disabled:opacity-40"
+          className="btn-primary"
         >
+          <Save size={16} strokeWidth={1.8} aria-hidden="true" />
           새기기
         </button>
         {isNew && (

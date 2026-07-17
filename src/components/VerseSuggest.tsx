@@ -10,6 +10,7 @@ import {
   type SemanticProgress,
   type Suggestion,
 } from "../lib/semantic";
+import { DownloadCloud, RotateCcw, Search, Sparkles } from "lucide-react";
 
 interface Props {
   body: string;
@@ -117,17 +118,21 @@ function VerseSuggest({ body, onPick, onFallback }: Props) {
       <button
         onClick={() => void start()}
         disabled={!canSearch}
-        className="text-sm text-dawn hover:brightness-110 disabled:opacity-40 disabled:hover:brightness-100"
+        className="btn-ghost !text-dawn disabled:!text-ink/35"
         title={canSearch ? undefined : "기록을 조금 더 적으면 찾을 수 있어요"}
       >
-        ✦ 이 하루에 닿는 말씀 찾기
+        <Sparkles size={15} strokeWidth={1.8} aria-hidden="true" />
+        이 하루에 닿는 말씀 찾기
       </button>
     );
 
   return (
-    <div className="border border-ink/15 rounded-lg p-4 bg-white/40">
+    <div className="surface p-4 md:p-5">
       {status.kind === "consent" && (
         <>
+          <span className="icon-tile mb-4">
+            <DownloadCloud size={19} strokeWidth={1.7} aria-hidden="true" />
+          </span>
           <p className="text-sm text-ink/80">
             기록의 결을 읽어 말씀을 찾아드립니다.
           </p>
@@ -138,13 +143,13 @@ function VerseSuggest({ body, onPick, onFallback }: Props) {
           <div className="mt-3 flex items-center gap-3">
             <button
               onClick={() => void prepare()}
-              className="text-sm bg-ink text-hanji rounded px-4 py-1.5 hover:bg-ink-soft transition-colors"
+              className="btn-primary !min-h-9"
             >
               준비하기
             </button>
             <button
               onClick={() => setStatus({ kind: "idle" })}
-              className="text-xs text-ink/40 hover:text-ink/70"
+              className="btn-ghost"
             >
               다음에
             </button>
@@ -177,12 +182,12 @@ function VerseSuggest({ body, onPick, onFallback }: Props) {
               ? "이 하루에 닿는 말씀입니다. 마음에 닿는 구절을 담아보세요."
               : "닿는 말씀을 찾지 못했습니다. 아래에서 키워드로 직접 찾아보세요."}
           </p>
-          <ul className="mt-2 divide-y divide-ink/8">
+          <ul className="mt-3 divide-y divide-ink/8">
             {status.items.map((s) => (
               <li key={`${s.ref.bookId}-${s.ref.chapter}-${s.ref.verse}`}>
                 <button
                   onClick={() => onPick(s.ref)}
-                  className="w-full text-left py-2.5 group"
+                  className="w-full rounded-lg px-2 py-3 text-left group hover:bg-dawn/6"
                 >
                   <span className="text-[11px] text-dawn">
                     {s.label} (개역한글)
@@ -200,11 +205,13 @@ function VerseSuggest({ body, onPick, onFallback }: Props) {
           <div className="mt-2 flex items-center gap-4">
             <button
               onClick={() => void run()}
-              className="text-xs text-ink/40 hover:text-ink/70"
+              className="btn-ghost"
             >
+              <RotateCcw size={13} strokeWidth={1.8} aria-hidden="true" />
               다시 찾기
             </button>
-            <button onClick={onFallback} className="text-xs text-ink/40 hover:text-ink/70">
+            <button onClick={onFallback} className="btn-ghost">
+              <Search size={13} strokeWidth={1.8} aria-hidden="true" />
               키워드로 직접 찾기
             </button>
           </div>
@@ -216,8 +223,9 @@ function VerseSuggest({ body, onPick, onFallback }: Props) {
           <p className="text-xs text-ink/60">{status.message}</p>
           <button
             onClick={onFallback}
-            className="mt-2 text-sm text-dawn hover:brightness-110"
+            className="btn-ghost mt-2 !text-dawn"
           >
+            <Search size={14} strokeWidth={1.8} aria-hidden="true" />
             키워드로 찾기
           </button>
         </>

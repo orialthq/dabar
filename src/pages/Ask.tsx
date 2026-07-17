@@ -10,6 +10,14 @@ import {
 import { buildContext, ask } from "../lib/ask";
 import { prepareSemantic } from "../lib/semantic";
 import VerseQuote from "../components/VerseQuote";
+import {
+  Cpu,
+  MessageCircleQuestion,
+  Send,
+  Settings,
+  ShieldCheck,
+  Sparkles,
+} from "lucide-react";
 
 interface Turn {
   question: string;
@@ -98,37 +106,53 @@ function Ask() {
 
   if (gate.kind === "unsupported")
     return (
-      <div className="max-w-2xl mx-auto px-6 py-14">
-        <h1 className="font-serif text-xl font-semibold">묻다</h1>
-        <p className="mt-4 text-sm text-ink/70 leading-6">
+      <div className="page-shell">
+        <p className="page-kicker">
+          <MessageCircleQuestion size={14} strokeWidth={1.8} aria-hidden="true" />
+          ASK
+        </p>
+        <h1 className="page-title">묻다</h1>
+        <div className="surface mt-6 p-5">
+          <p className="text-sm text-ink/70 leading-6">
           기본 응답 방식(내 기기에서 실행)은 WebGPU 지원 브라우저가 필요한데, 이 브라우저에서는
           사용할 수 없습니다. 최신 Chrome/Edge/Safari로 열거나,{" "}
           <a href="#/settings" className="text-dawn">
             설정
           </a>
           에서 다른 응답 방식(Ollama·Anthropic)을 선택하세요.
-        </p>
-        <p className="mt-3 text-xs text-ink/45">
+          </p>
+          <p className="mt-3 text-xs text-ink/45">
           읽다·찾다·새기다(말씀 추천 포함)는 이 브라우저에서도 모두 동작합니다.
-        </p>
+          </p>
+        </div>
       </div>
     );
 
   return (
-    <div className="max-w-2xl mx-auto px-6 py-10 md:py-14 flex flex-col min-h-[70vh]">
-      <div className="flex items-baseline justify-between">
-        <h1 className="font-serif text-xl font-semibold">묻다</h1>
-        <a href="#/settings" className="text-xs text-ink/40 hover:text-dawn">
-          응답 방식: {settings.kind === "webllm" ? "내 기기" : settings.kind === "ollama" ? "Ollama" : "Anthropic"} · 설정
+    <div className="page-shell flex min-h-[76vh] flex-col">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="page-kicker">
+            <MessageCircleQuestion size={14} strokeWidth={1.8} aria-hidden="true" />
+            ASK
+          </p>
+          <h1 className="page-title">묻다</h1>
+        </div>
+        <a href="#/settings" className="btn-secondary !min-h-9 !px-3 !text-[11px]">
+          <Settings size={14} strokeWidth={1.8} aria-hidden="true" />
+          {settings.kind === "webllm" ? "내 기기" : settings.kind === "ollama" ? "Ollama" : "Anthropic"}
         </a>
       </div>
-      <p className="mt-1 text-xs text-ink/50">
+      <p className="page-lead !mt-2 !text-xs">
         일상과 신앙의 물음을 적어보세요. 관련 말씀을 찾아 그 안에서 함께 생각합니다.
         답은 참고일 뿐, 말씀 앞에서 스스로 상고하세요.
       </p>
 
       {gate.kind === "consent" && (
-        <div className="mt-6 border border-ink/15 rounded-lg p-4 bg-white/40">
+        <div className="surface mt-6 p-5">
+          <span className="icon-tile mb-4">
+            <ShieldCheck size={19} strokeWidth={1.7} aria-hidden="true" />
+          </span>
           <p className="text-sm text-ink/80">묻다는 기기 안에서 동작하는 언어 모델을 사용합니다.</p>
           <p className="mt-1 text-xs text-ink/50 leading-5">
             처음 한 번, 약 2.3GB를 내려받습니다 (Wi-Fi 필수 권장). 이후에는 저장된 것을 다시 쓰며,
@@ -137,24 +161,30 @@ function Ask() {
           <div className="mt-3 flex items-center gap-3">
             <button
               onClick={() => setGate({ kind: "ready" })}
-              className="text-sm bg-ink text-hanji rounded px-4 py-1.5 hover:bg-ink-soft transition-colors"
+              className="btn-primary !min-h-9"
             >
               알겠어요
             </button>
-            <a href="#/settings" className="text-xs text-ink/40 hover:text-ink/70">
+            <a href="#/settings" className="btn-ghost">
               다른 응답 방식 쓰기
             </a>
           </div>
         </div>
       )}
 
-      <div className="flex-1 mt-6 space-y-8">
+      <div className="mt-8 flex-1 space-y-9">
         {turns.map((t, i) => (
           <div key={i}>
-            <p className="text-sm text-ink/60 bg-hanji-dim rounded-lg px-4 py-2.5 inline-block">
-              {t.question}
-            </p>
-            <div className="mt-3">
+            <div className="flex justify-end">
+              <p className="max-w-[88%] rounded-[1rem_1rem_0.25rem_1rem] bg-ink px-4 py-3 text-sm leading-6 text-hanji shadow-sm">
+                {t.question}
+              </p>
+            </div>
+            <div className="mt-4 flex gap-3">
+              <span className="icon-tile !h-8 !w-8 !rounded-lg">
+                <Sparkles size={15} strokeWidth={1.7} aria-hidden="true" />
+              </span>
+              <div className="min-w-0 flex-1 pt-0.5">
               {t.error ? (
                 <p className="text-xs text-red-800/80">{t.error}</p>
               ) : (
@@ -172,12 +202,16 @@ function Ask() {
                   )}
                 </>
               )}
+              </div>
             </div>
           </div>
         ))}
         {gate.kind === "loading" && (
-          <div>
-            <p className="text-xs text-ink/50">모델 준비 중 — {Math.round(gate.progress * 100)}%</p>
+          <div className="surface-soft p-4">
+            <p className="flex items-center gap-2 text-xs text-ink/50">
+              <Cpu size={14} strokeWidth={1.7} className="text-dawn" aria-hidden="true" />
+              응답 준비 중 — {Math.round(gate.progress * 100)}%
+            </p>
             <div className="mt-2 h-1 rounded bg-ink/10 overflow-hidden">
               <div className="h-full bg-dawn transition-all" style={{ width: `${gate.progress * 100}%` }} />
             </div>
@@ -187,7 +221,7 @@ function Ask() {
         <div ref={bottomRef} />
       </div>
 
-      <div className="mt-8 flex gap-2">
+      <div className="surface sticky bottom-4 mt-8 flex gap-2 p-2 shadow-[0_18px_45px_rgb(16_21_31_/_0.12)]">
         <input
           type="text"
           value={input}
@@ -198,17 +232,18 @@ function Ask() {
               void run();
             }
           }}
-          placeholder="예: 요즘 기도가 잘 안 되는데 어떻게 해야 할까요?"
+          placeholder="마음에 품은 물음을 적어보세요"
           aria-label="질문"
           disabled={busy}
-          className="flex-1 bg-white/70 border border-ink/20 rounded-full px-4 py-2.5 text-sm placeholder:text-ink/30 focus:outline-none focus:border-dawn disabled:opacity-50"
+          className="field !border-0 !bg-transparent !shadow-none"
         />
         <button
           onClick={() => void run()}
           disabled={busy || !input.trim()}
-          className="bg-ink text-hanji text-sm rounded-full px-5 hover:bg-ink-soft transition-colors disabled:opacity-40"
+          className="btn-primary !h-11 !w-11 shrink-0 !px-0"
+          aria-label="묻기"
         >
-          묻기
+          <Send size={17} strokeWidth={1.8} aria-hidden="true" />
         </button>
       </div>
     </div>
