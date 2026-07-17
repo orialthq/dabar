@@ -1,11 +1,30 @@
 import { useState } from "react";
 import type { SearchHit } from "../types/bible";
 import { searchBible } from "../lib/bible";
+import { resolveVerse } from "../lib/journal";
+import {
+  isSemanticSupported,
+  isSemanticReady,
+  isSemanticCached,
+  semanticSearch,
+  type SemanticProgress,
+} from "../lib/semantic";
+
+type Mode = "keyword" | "semantic";
+
+interface SemanticResult {
+  label: string; // "시편 23:1"
+  href: string;
+  text: string;
+}
 
 type Status =
   | { kind: "idle" }
   | { kind: "loading"; done: number; total: number }
   | { kind: "done"; hits: SearchHit[]; truncated: boolean; query: string }
+  | { kind: "sem-consent" }
+  | { kind: "sem-loading"; percent: number | null }
+  | { kind: "sem-done"; results: SemanticResult[]; query: string }
   | { kind: "error"; message: string };
 
 function Highlight({ text, query }: { text: string; query: string }) {
@@ -28,11 +47,10 @@ function Highlight({ text, query }: { text: string; query: string }) {
 
 function Search() {
   const [input, setInput] = useState("");
+  const [mode, setMode] = useState<Mode>("keyword");
   const [status, setStatus] = useState<Status>({ kind: "idle" });
 
-  const run = async () => {
-    const q = input.trim();
-    if (!q) return;
+  const runKeyword = async (q: string) => {
     setStatus({ kind: "loading", done: 0, total: 66 });
     try {
       const { hits, truncated } = await searchBible(q, (done, total) =>
@@ -44,22 +62,92 @@ function Search() {
     }
   };
 
+  const runSemantic = async (q: string) => {
+    setStatus({ kind: "sem-loading", percent: null });
+    try {
+      const onProgress = (p: SemanticProgress) => {
+        if (p.kind === "model" && p.total > 0)
+          setStatus({ kind: "sem-loading", percent: Math.round((p.loaded / p.total) * 100) });
+      };
+      const hits = await semanticSearch(q, 20, onProgress);
+      const results: SemanticResult[] = [];
+      for (const h of hits) {
+        const r = await resolveVerse(h.ref);
+        if (r)
+          results.push({
+            label: r.label,
+            text: r.text,
+            href: `#/read/${h.ref.bookId}/${h.ref.chapter}/${h.ref.verse}`,
+          });
+      }
+      setStatus({ kind: "sem-done", results, query: q });
+    } catch {
+      setStatus({
+        kind: "error",
+        message: "뜻으로 찾기가 끊겼습니다. 네트워크를 확인해 다시 시도해 보세요.",
+      });
+    }
+  };
+
+  const run = async () => {
+    const q = input.trim();
+    if (!q) return;
+    if (mode === "keyword") return runKeyword(q);
+    if (!isSemanticSupported()) {
+      setStatus({
+        kind: "error",
+        message: "이 브라우저에서는 뜻으로 찾기를 열 수 없습니다. 키워드로 찾아보세요.",
+      });
+      return;
+    }
+    if (isSemanticReady() || (await isSemanticCached())) return runSemantic(q);
+    setStatus({ kind: "sem-consent" });
+  };
+
   return (
     <div className="max-w-2xl mx-auto px-6 py-10 md:py-14">
       <h1 className="font-serif text-2xl md:text-3xl font-semibold">찾다</h1>
       <p className="mt-2 text-sm text-ink/55">
-        키워드로 성경 전체(개역한글)에서 구절을 찾습니다.
+        {mode === "keyword"
+          ? "키워드로 성경 전체(개역한글)에서 구절을 찾습니다."
+          : "문장으로 물으면, 뜻이 닿는 구절을 성경 전체에서 찾습니다."}
       </p>
 
-      <div className="mt-8 flex gap-2">
+      <div className="mt-6 flex gap-1 text-sm">
+        {(
+          [
+            ["keyword", "말씀으로 찾기"],
+            ["semantic", "뜻으로 찾기"],
+          ] as [Mode, string][]
+        ).map(([m, label]) => (
+          <button
+            key={m}
+            onClick={() => {
+              setMode(m);
+              setStatus({ kind: "idle" });
+            }}
+            className={`rounded-full px-4 py-1.5 border transition-colors ${
+              mode === m
+                ? "border-dawn bg-dawn/15 text-ink"
+                : "border-ink/15 text-ink/50 hover:border-ink/35"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-4 flex gap-2">
         <input
           type="search"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => {
-            if (e.key === "Enter") void run();
+            if (e.key === "Enter" && !e.nativeEvent.isComposing) void run();
           }}
-          placeholder="예: 두려워 말라"
+          placeholder={
+            mode === "keyword" ? "예: 두려워 말라" : "예: 마음이 무거운 날에 붙들 말씀"
+          }
           aria-label="검색어"
           className="flex-1 bg-white/60 border border-ink/20 rounded-lg px-4 py-2.5 text-[15px] placeholder:text-ink/30 focus:outline-none focus:border-dawn"
         />
@@ -74,8 +162,9 @@ function Search() {
       <div className="mt-8">
         {status.kind === "idle" && (
           <p className="text-sm text-ink/40">
-            첫 검색 시 성경 전체 본문(약 4.5MB)을 내려받아 이후 검색은 즉시
-            이루어집니다.
+            {mode === "keyword"
+              ? "첫 검색 시 성경 전체 본문(약 4.5MB)을 내려받아 이후 검색은 즉시 이루어집니다."
+              : "말씀의 뜻을 읽어 찾아드립니다. 처음 한 번은 준비물(약 130MB)을 내려받습니다."}
           </p>
         )}
         {status.kind === "loading" && (
@@ -83,8 +172,55 @@ function Search() {
             {status.done}/{status.total}권 살피는 중…
           </p>
         )}
+        {status.kind === "sem-consent" && (
+          <div className="border border-ink/15 rounded-lg p-4 bg-white/40">
+            <p className="text-sm text-ink/80">뜻으로 찾기는 기록의 결을 읽는 준비가 필요합니다.</p>
+            <p className="mt-1 text-xs text-ink/50 leading-5">
+              처음 한 번, 약 130MB를 내려받습니다 (Wi-Fi 권장). 이후에는 저장된 것을 다시
+              쓰며, 검색어는 이 기기 밖으로 나가지 않습니다.
+            </p>
+            <button
+              onClick={() => void runSemantic(input.trim())}
+              className="mt-3 text-sm bg-ink text-hanji rounded px-4 py-1.5 hover:bg-ink-soft transition-colors"
+            >
+              준비하고 찾기
+            </button>
+          </div>
+        )}
+        {status.kind === "sem-loading" && (
+          <>
+            <p className="text-sm text-ink/50">
+              말씀의 결을 살피는 중{status.percent !== null && ` — ${status.percent}%`}
+            </p>
+            <div className="mt-2 h-1 rounded bg-ink/10 overflow-hidden">
+              <div
+                className="h-full bg-dawn transition-all"
+                style={{ width: `${status.percent ?? 5}%` }}
+              />
+            </div>
+          </>
+        )}
         {status.kind === "error" && (
           <p className="text-sm text-ink/70">{status.message}</p>
+        )}
+        {status.kind === "sem-done" && (
+          <>
+            <p className="text-sm text-ink/55">
+              &ldquo;{status.query}&rdquo; — 뜻이 닿는 구절 {status.results.length}개
+            </p>
+            <ol className="mt-6 space-y-5">
+              {status.results.map((r) => (
+                <li key={r.label}>
+                  <a href={r.href} className="block group">
+                    <span className="text-xs text-dawn font-medium">{r.label}</span>
+                    <p className="mt-1 font-serif text-[15px] leading-6 text-ink/85 group-hover:text-ink">
+                      {r.text}
+                    </p>
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </>
         )}
         {status.kind === "done" && (
           <>
@@ -112,7 +248,8 @@ function Search() {
             {status.hits.length === 0 && (
               <p className="mt-4 text-sm text-ink/45">
                 해당 표현이 없습니다. 개역한글은 1961년 표기를 사용합니다 — 예:
-                &ldquo;셋째&rdquo;가 아니라 &ldquo;세째&rdquo;.
+                &ldquo;셋째&rdquo;가 아니라 &ldquo;세째&rdquo;. 문장으로 찾고 싶다면
+                &ldquo;뜻으로 찾기&rdquo;를 눌러보세요.
               </p>
             )}
           </>

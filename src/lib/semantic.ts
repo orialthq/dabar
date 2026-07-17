@@ -365,6 +365,43 @@ export async function suggestVerses(
   return result;
 }
 
+export interface SemanticHit {
+  ref: VerseRef;
+  score: number;
+}
+
+/**
+ * 뜻으로 찾기 (M7②): 전 절 시맨틱 검색 top-k. 같은 장은 최고 점수 한 절만 남긴다.
+ * 참조만 반환 — 본문 렌더링은 로컬 DB.
+ */
+export async function semanticSearch(
+  query: string,
+  k = 20,
+  onProgress?: (p: SemanticProgress) => void
+): Promise<SemanticHit[]> {
+  const trimmed = query.trim();
+  if (!trimmed) return [];
+  const [embed, index] = await Promise.all([loadEmbedder(onProgress), loadIndex()]);
+  const { meta, vectors, scales } = index;
+  const out = await embed([`${meta.queryPrefix}${trimmed}`], {
+    pooling: "mean",
+    normalize: true,
+  });
+  const pool = denseTopK(out.data, vectors, scales, meta.total, meta.dim, k * 3);
+  out.dispose?.();
+  const seen = new Set<string>();
+  const hits: SemanticHit[] = [];
+  for (const { idx, score } of pool) {
+    const ref = indexToRef(meta, idx);
+    const key = `${ref.bookId}:${ref.chapter}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    hits.push({ ref, score });
+    if (hits.length >= k) break;
+  }
+  return hits;
+}
+
 /**
  * 돌아보기(M7)용 텍스트 분석: 임베딩 벡터 + 최고 점수 주제.
  * 모델이 준비/캐시된 경우에만 호출할 것 (게이트는 호출부 책임).
