@@ -1,7 +1,7 @@
 {
   "name": "dabar",
   "private": true,
-  "version": "0.5.0",
+  "version": "0.6.0",
   "type": "module",
   "main": "electron/main.mjs",
   "scripts": {
@@ -30,7 +30,8 @@
     "sharp": "^0.35.3",
     "tailwindcss": "^4.1.0",
     "typescript": "~5.6.2",
-    "vite": "^6.0.0"
+    "vite": "^6.0.0",
+    "vite-plugin-pwa": "^1.3.0"
   },
   "build": {
     "appId": "dev.orialt.dabar",
