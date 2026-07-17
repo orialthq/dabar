@@ -100,6 +100,90 @@ export async function exportMarkdown(entries: Entry[]): Promise<string> {
   return lines.join("\n");
 }
 
+// ---- JSON 백업·가져오기 (M7③) ----
+
+interface BackupFile {
+  app: "dabar";
+  format: 1;
+  exportedAt: string;
+  entries: Entry[];
+}
+
+/** 새김 전체를 복원 가능한 JSON으로 직렬화 */
+export function exportBackup(entries: Entry[]): string {
+  const backup: BackupFile = {
+    app: "dabar",
+    format: 1,
+    exportedAt: new Date().toISOString(),
+    entries,
+  };
+  return JSON.stringify(backup, null, 2);
+}
+
+function isValidEntry(e: unknown): e is Entry {
+  if (typeof e !== "object" || e === null) return false;
+  const o = e as Record<string, unknown>;
+  return (
+    typeof o.id === "string" &&
+    typeof o.createdAt === "string" &&
+    typeof o.updatedAt === "string" &&
+    typeof o.title === "string" &&
+    typeof o.body === "string" &&
+    Array.isArray(o.verses) &&
+    o.verses.every(
+      (v) =>
+        typeof v === "object" &&
+        v !== null &&
+        typeof (v as VerseRef).bookId === "string" &&
+        typeof (v as VerseRef).chapter === "number" &&
+        typeof (v as VerseRef).verse === "number"
+    )
+  );
+}
+
+export interface ImportResult {
+  added: number;
+  updated: number;
+  kept: number;
+}
+
+/**
+ * 백업 JSON을 현재 새김과 병합. id 기준 — 없으면 추가, 있으면 updatedAt이 최신인 쪽 유지.
+ * 형식이 아니면 예외를 던진다 (기존 새김은 건드리지 않음).
+ */
+export function importBackup(text: string): ImportResult {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(text);
+  } catch {
+    throw new Error("JSON 파일이 아닙니다.");
+  }
+  const b = parsed as Partial<BackupFile>;
+  if (b.app !== "dabar" || !Array.isArray(b.entries)) {
+    throw new Error("다바르 백업 파일이 아닙니다.");
+  }
+  const incoming = b.entries.filter(isValidEntry);
+  if (incoming.length !== b.entries.length) {
+    throw new Error("백업 안에 손상된 새김이 있어 중단했습니다. 파일을 확인해 주세요.");
+  }
+  const current = new Map(loadEntries().map((e) => [e.id, e]));
+  const result: ImportResult = { added: 0, updated: 0, kept: 0 };
+  for (const e of incoming) {
+    const mine = current.get(e.id);
+    if (!mine) {
+      current.set(e.id, e);
+      result.added++;
+    } else if (e.updatedAt > mine.updatedAt) {
+      current.set(e.id, e);
+      result.updated++;
+    } else {
+      result.kept++;
+    }
+  }
+  persist([...current.values()].sort((a, b2) => b2.createdAt.localeCompare(a.createdAt)));
+  return result;
+}
+
 export function downloadText(filename: string, text: string): void {
   const blob = new Blob([text], { type: "text/markdown;charset=utf-8" });
   const url = URL.createObjectURL(blob);

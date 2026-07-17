@@ -1,6 +1,12 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Entry } from "../types/journal";
-import { loadEntries, exportMarkdown, downloadText } from "../lib/journal";
+import {
+  loadEntries,
+  exportMarkdown,
+  exportBackup,
+  importBackup,
+  downloadText,
+} from "../lib/journal";
 import { anniversaries, canReflect, ensureVectors, themeOf } from "../lib/reflect";
 
 function fmtDate(iso: string): string {
@@ -58,6 +64,9 @@ function Journal() {
     return entries.filter((e) => themeOf(e.id)?.id === themeFilter);
   }, [entries, themeFilter, vecTick]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const [importMsg, setImportMsg] = useState<string | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+
   const onExport = async () => {
     setExporting(true);
     try {
@@ -66,6 +75,23 @@ function Journal() {
       downloadText(`dabar-saegim-${stamp}.md`, md);
     } finally {
       setExporting(false);
+    }
+  };
+
+  const onBackup = () => {
+    const stamp = new Date().toISOString().slice(0, 10);
+    downloadText(`dabar-backup-${stamp}.json`, exportBackup(entries));
+  };
+
+  const onImportFile = async (file: File) => {
+    try {
+      const r = importBackup(await file.text());
+      setEntries(loadEntries());
+      setImportMsg(
+        `가져왔습니다 — 새로 ${r.added}편, 갱신 ${r.updated}편, 그대로 ${r.kept}편.`
+      );
+    } catch (e) {
+      setImportMsg(e instanceof Error ? e.message : "가져오지 못했습니다.");
     }
   };
 
@@ -171,7 +197,12 @@ function Journal() {
               );
             })}
           </ol>
-          <div className="mt-10 flex justify-end">
+        </>
+      )}
+
+      <div className="mt-10 flex flex-wrap justify-end gap-2">
+        {entries.length > 0 && (
+          <>
             <button
               onClick={() => void onExport()}
               disabled={exporting}
@@ -179,13 +210,39 @@ function Journal() {
             >
               {exporting ? "내보내는 중…" : "마크다운으로 내보내기"}
             </button>
-          </div>
-          <p className="mt-3 text-right text-[11px] text-ink/35">
-            새김은 이 기기(브라우저)에만 머뭅니다. 기기를 옮기기 전에
-            내보내기로 챙겨 두세요.
-          </p>
-        </>
+            <button
+              onClick={onBackup}
+              className="text-xs text-ink/50 hover:text-ink border border-ink/20 rounded px-3 py-1.5"
+            >
+              백업 (JSON)
+            </button>
+          </>
+        )}
+        <button
+          onClick={() => fileRef.current?.click()}
+          className="text-xs text-ink/50 hover:text-ink border border-ink/20 rounded px-3 py-1.5"
+        >
+          백업 가져오기
+        </button>
+        <input
+          ref={fileRef}
+          type="file"
+          accept="application/json,.json"
+          className="hidden"
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (f) void onImportFile(f);
+            e.target.value = "";
+          }}
+        />
+      </div>
+      {importMsg && (
+        <p className="mt-3 text-right text-[11px] text-ink/55">{importMsg}</p>
       )}
+      <p className="mt-3 text-right text-[11px] text-ink/35">
+        새김은 이 기기(브라우저)에만 머뭅니다. 기기를 옮길 때는 백업(JSON)으로
+        내보내고, 새 기기에서 가져오세요.
+      </p>
     </div>
   );
 }
