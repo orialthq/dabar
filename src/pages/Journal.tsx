@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Entry } from "../types/journal";
 import { loadEntries, exportMarkdown, downloadText } from "../lib/journal";
+import { anniversaries, canReflect, ensureVectors, themeOf } from "../lib/reflect";
 
 function fmtDate(iso: string): string {
   return new Date(iso).toLocaleDateString("ko-KR", {
@@ -14,10 +15,48 @@ function fmtDate(iso: string): string {
 function Journal() {
   const [entries, setEntries] = useState<Entry[]>([]);
   const [exporting, setExporting] = useState(false);
+  const [themeFilter, setThemeFilter] = useState<string | null>(null);
+  const [vecTick, setVecTick] = useState(0); // 벡터 캐시 갱신 시 뱃지 리렌더
 
   useEffect(() => {
     setEntries(loadEntries());
   }, []);
+
+  // 모델이 준비돼 있으면 조용히 새김 벡터·주제를 채워 나간다 (한 번에 8개씩)
+  useEffect(() => {
+    if (entries.length === 0) return;
+    let alive = true;
+    (async () => {
+      if (!(await canReflect())) return;
+      const done = await ensureVectors(entries);
+      if (alive && done > 0) setVecTick((t) => t + 1);
+    })().catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, [entries]);
+
+  const remembered = useMemo(() => anniversaries(entries), [entries]);
+
+  // 주제 연대기: 캐시된 주제 라벨 수집
+  const themes = useMemo(() => {
+    void vecTick;
+    const seen = new Map<string, { label: string; count: number }>();
+    for (const e of entries) {
+      const t = themeOf(e.id);
+      if (!t) continue;
+      const cur = seen.get(t.id);
+      seen.set(t.id, { label: t.label, count: (cur?.count ?? 0) + 1 });
+    }
+    return [...seen.entries()]
+      .map(([id, v]) => ({ id, ...v }))
+      .sort((a, b) => b.count - a.count);
+  }, [entries, vecTick]);
+
+  const visible = useMemo(() => {
+    if (!themeFilter) return entries;
+    return entries.filter((e) => themeOf(e.id)?.id === themeFilter);
+  }, [entries, themeFilter, vecTick]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const onExport = async () => {
     setExporting(true);
@@ -49,6 +88,42 @@ function Journal() {
         </a>
       </div>
 
+      {remembered.length > 0 && (
+        <div className="mt-8 gyeseon rounded-sm px-5 py-4">
+          <p className="font-serif text-sm font-semibold text-ink/70">돌아보기</p>
+          <ul className="mt-2 space-y-2">
+            {remembered.map(({ entry, label }) => (
+              <li key={entry.id}>
+                <a href={`#/write/${entry.id}`} className="group block">
+                  <span className="text-[11px] text-dawn">{label}</span>
+                  <p className="text-sm text-ink/70 group-hover:text-ink line-clamp-1">
+                    {entry.title || entry.body}
+                  </p>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {themes.length > 1 && (
+        <div className="mt-6 flex flex-wrap gap-2">
+          {themes.map((t) => (
+            <button
+              key={t.id}
+              onClick={() => setThemeFilter(themeFilter === t.id ? null : t.id)}
+              className={`text-[11px] rounded-full px-3 py-1 border transition-colors ${
+                themeFilter === t.id
+                  ? "border-dawn bg-dawn/15 text-ink"
+                  : "border-ink/15 text-ink/50 hover:border-ink/35"
+              }`}
+            >
+              {t.label} {t.count}
+            </button>
+          ))}
+        </div>
+      )}
+
       {entries.length === 0 ? (
         <div className="mt-16 text-center">
           <p className="font-serif text-lg text-ink/60">
@@ -61,32 +136,40 @@ function Journal() {
         </div>
       ) : (
         <>
-          <ol className="mt-10 space-y-4">
-            {entries.map((e) => (
-              <li key={e.id}>
-                <a
-                  href={`#/write/${e.id}`}
-                  className="block border border-ink/12 rounded-lg p-5 bg-white/40 hover:border-dawn/60 transition-colors"
-                >
-                  <div className="flex items-baseline justify-between gap-4">
-                    <span className="text-xs text-ink/45">
-                      {fmtDate(e.createdAt)}
-                    </span>
-                    {e.verses.length > 0 && (
-                      <span className="text-[11px] text-dawn">
-                        말씀 {e.verses.length}
+          <ol className="mt-8 space-y-4">
+            {visible.map((e) => {
+              const theme = themeOf(e.id);
+              return (
+                <li key={e.id}>
+                  <a
+                    href={`#/write/${e.id}`}
+                    className="block border border-ink/12 rounded-lg p-5 bg-white/40 hover:border-dawn/60 transition-colors"
+                  >
+                    <div className="flex items-baseline justify-between gap-4">
+                      <span className="text-xs text-ink/45">
+                        {fmtDate(e.createdAt)}
+                        {theme && (
+                          <span className="ml-2 text-[11px] text-ink/35">
+                            {theme.label}
+                          </span>
+                        )}
                       </span>
+                      {e.verses.length > 0 && (
+                        <span className="text-[11px] text-dawn">
+                          말씀 {e.verses.length}
+                        </span>
+                      )}
+                    </div>
+                    {e.title && (
+                      <h2 className="mt-2 font-medium text-[15px]">{e.title}</h2>
                     )}
-                  </div>
-                  {e.title && (
-                    <h2 className="mt-2 font-medium text-[15px]">{e.title}</h2>
-                  )}
-                  <p className="mt-1 text-sm leading-6 text-ink/70 line-clamp-3 whitespace-pre-line">
-                    {e.body}
-                  </p>
-                </a>
-              </li>
-            ))}
+                    <p className="mt-1 text-sm leading-6 text-ink/70 line-clamp-3 whitespace-pre-line">
+                      {e.body}
+                    </p>
+                  </a>
+                </li>
+              );
+            })}
           </ol>
           <div className="mt-10 flex justify-end">
             <button

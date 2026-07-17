@@ -366,6 +366,34 @@ export async function suggestVerses(
 }
 
 /**
+ * 돌아보기(M7)용 텍스트 분석: 임베딩 벡터 + 최고 점수 주제.
+ * 모델이 준비/캐시된 경우에만 호출할 것 (게이트는 호출부 책임).
+ */
+export async function analyzeText(
+  text: string
+): Promise<{ vec: Float32Array; themeId: string; themeLabel: string }> {
+  const [embed, themes] = await Promise.all([loadEmbedder(), loadThemes()]);
+  const out = await embed([`${themes.queryPrefix}${text.trim()}`], {
+    pooling: "mean",
+    normalize: true,
+  });
+  const vec = new Float32Array(out.data);
+  out.dispose?.();
+  const themeScores = new Array<number>(themes.themes.length).fill(-Infinity);
+  for (let a = 0; a < themes.anchorTheme.length; a++) {
+    let dot = 0;
+    const base = a * themes.dim;
+    for (let d = 0; d < themes.dim; d++) dot += vec[d] * themes.anchorVectors[base + d];
+    const score = dot * themes.anchorScales[a];
+    const t = themes.anchorTheme[a];
+    if (score > themeScores[t]) themeScores[t] = score;
+  }
+  let best = 0;
+  for (let t = 1; t < themeScores.length; t++) if (themeScores[t] > themeScores[best]) best = t;
+  return { vec, themeId: themes.themes[best].id, themeLabel: themes.themes[best].label };
+}
+
+/**
  * 묻다(M5b) 역전 RAG용 검색: 1위 주제 큐레이션 3건 + 전 절 시맨틱 상위(장 중복 억제) 5건.
  * 참조만 반환 — 본문 해석과 프롬프트 구성은 ask.ts 담당.
  */

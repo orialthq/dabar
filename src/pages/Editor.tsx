@@ -13,6 +13,7 @@ import VerseQuote from "../components/VerseQuote";
 import VersePicker from "../components/VersePicker";
 import VerseSuggest from "../components/VerseSuggest";
 import MeditationPrompt from "../components/MeditationPrompt";
+import SimilarEntries from "../components/SimilarEntries";
 
 interface Props {
   entryId?: string; // 없으면 새 새김
@@ -190,6 +191,8 @@ function Editor({ entryId }: Props) {
           </span>
         )}
       </div>
+
+      {entryId && <SimilarEntries entryId={entryId} />}
     </div>
   );
 }
