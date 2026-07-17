@@ -17,7 +17,9 @@
 ## 아키텍처 요점
 - 성경 데이터: `public/bible/books.json` + `{id}.json` (66권, 31,102절, 무결성 검증 완료 — 출처와 검증 과정은 `scripts/DATA.md`)
 - 라우팅: 해시 기반 (`src/lib/router.ts`) — #/read, #/search, #/ask, #/write, #/settings (전부 구현됨)
-- 새김: 참조만 저장(본문 저장 금지), 렌더 시 DB 해석 (`src/lib/journal.ts`)
+- 새김: 참조만 저장(본문 저장 금지), 렌더 시 DB 해석 (`src/lib/journal.ts`). JSON 백업·가져오기(id 병합) 포함
+- 돌아보기(`src/lib/reflect.ts`): 기념일 회상(날짜만) + 새김 임베딩 int8 캐시(localStorage)로 주제 뱃지·닮은 새김. 모델 없으면 임베딩 기능만 조용히 생략
+- PWA: vite-plugin-pwa, 사전 캐시는 앱 셸만·대용량은 런타임 CacheFirst, SW는 http(s)에서만 등록(데스크톱 app:// 제외)
 - AI(M5): 말씀 추천 = **주제 앵커 하이브리드**(주제 분류 → 큐레이션 `scripts/themes.json` + 전 절 시맨틱 "발견" 슬롯 — 순수 dense는 골든셋 0/10 실측으로 기각, SPEC-M5 §5), 챗 = 엔진 추상화 `src/lib/engine.ts`(webllm Qwen3-4B 기본 / ollama / anthropic BYOK). 상세는 `SPEC-M5.md`
 - 참조 검증(`src/lib/ask.ts resolveRefs`): AI 참조 → 공급 목록 화이트리스트 + DB 대조 → 무효 폐기. 역전 RAG(검색이 절 공급, LLM은 그 안에서만)와 함께 챗 레이어의 불변 구조
 
@@ -43,3 +45,4 @@
 - [x] M5a 하이브리드 말씀 추천 (로컬, 전 사용자) — 주제 앵커 + 큐레이션 + 발견 슬롯, 골든셋 9/10
 - [x] M5b WebLLM 챗 레이어 + 엔진 추상화 — 역전 RAG 묻다 + 묵상 질문, Qwen3-4B 기본
 - [x] M6 데스크톱 앱 (Electron, macOS·Windows, 무서명 + GitHub Releases) — v0.1.0 릴리스 발행
+- [x] M7 고도화 4종 — ①돌아보기(v0.3.0) ②뜻으로 찾기(v0.4.0) ③백업·가져오기(v0.5.0) ④PWA(v0.6.0)
